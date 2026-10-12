@@ -32,9 +32,7 @@ export const FormFields: Story = {
         {(control) => <Input {...control} placeholder="Escribir…" />}
       </FormField>
       <FormField label="Justificación" required>
-        {(control) => (
-          <Textarea {...control} placeholder="Escribir justificación…" />
-        )}
+        {(control) => <Textarea {...control} placeholder="Escribir justificación…" />}
       </FormField>
     </div>
   ),
@@ -52,21 +50,9 @@ const countries: SelectOptionItem[] = [
 ];
 
 const people: SelectOptionItem[] = [
-  {
-    value: "andres.rios",
-    label: "andres.rios",
-    description: "Director y profesor del Instituto de Física",
-  },
-  {
-    value: "juan.giraldo",
-    label: "juan.giraldo",
-    description: "Profesor de planta del Instituto de Física",
-  },
-  {
-    value: "laura.toro",
-    label: "laura.toro",
-    description: "Secretaria de la Decanatura",
-  },
+  { value: "andres.rios", label: "andres.rios", description: "Director y profesor del Instituto de Física" },
+  { value: "juan.giraldo", label: "juan.giraldo", description: "Profesor de planta del Instituto de Física" },
+  { value: "laura.toro", label: "laura.toro", description: "Secretaria de la Decanatura" },
 ];
 
 const languages: SelectOptionItem[] = [
@@ -83,63 +69,19 @@ function SelectDemo() {
   return (
     <div className="grid max-w-3xl grid-cols-2 gap-6">
       <FormField label="País">
-        {(control) => (
-          <Select
-            {...control}
-            options={countries}
-            value={country}
-            onChange={setCountry}
-            searchable
-          />
-        )}
+        {(control) => <Select {...control} options={countries} value={country} onChange={setCountry} searchable />}
       </FormField>
       <FormField label="Idioma">
-        {(control) => (
-          <Select
-            {...control}
-            options={languages}
-            value={language}
-            onChange={setLanguage}
-          />
-        )}
+        {(control) => <Select {...control} options={languages} value={language} onChange={setLanguage} />}
       </FormField>
-      <FormField
-        label="Persona"
-        helperText="Cada opción con su descripción en una segunda línea"
-      >
-        {(control) => (
-          <Select
-            {...control}
-            options={people}
-            value={person}
-            onChange={setPerson}
-            searchable
-          />
-        )}
+      <FormField label="Persona" helperText="Cada opción con su descripción en una segunda línea">
+        {(control) => <Select {...control} options={people} value={person} onChange={setPerson} searchable />}
       </FormField>
-      <FormField
-        label="Departamento o estado"
-        error="El departamento es obligatorio"
-      >
-        {(control) => (
-          <Select
-            {...control}
-            options={[]}
-            value={null}
-            onChange={setLanguage}
-          />
-        )}
+      <FormField label="Departamento o estado" error="El departamento es obligatorio">
+        {(control) => <Select {...control} options={[]} value={null} onChange={setLanguage} />}
       </FormField>
       <FormField label="Ciudad">
-        {(control) => (
-          <Select
-            {...control}
-            options={[]}
-            value={null}
-            onChange={setLanguage}
-            disabled
-          />
-        )}
+        {(control) => <Select {...control} options={[]} value={null} onChange={setLanguage} disabled />}
       </FormField>
     </div>
   );
@@ -149,13 +91,7 @@ export const Selects: Story = {
   render: () => <SelectDemo />,
 };
 
-const intents: {
-  intent: ModalIntent;
-  title: string;
-  description: string;
-  action: string;
-  icon?: typeof Check;
-}[] = [
+const intents: { intent: ModalIntent; title: string; description: string; action: string; icon?: typeof Check }[] = [
   {
     intent: "neutral",
     title: "Cambiar rol",
@@ -176,12 +112,7 @@ const intents: {
     action: "Devolver",
     icon: Undo2,
   },
-  {
-    intent: "danger",
-    title: "Rechazar comisión",
-    description: "El rechazo es definitivo.",
-    action: "Rechazar",
-  },
+  { intent: "danger", title: "Rechazar comisión", description: "El rechazo es definitivo.", action: "Rechazar" },
 ];
 
 function ModalDemo() {
@@ -191,12 +122,7 @@ function ModalDemo() {
   return (
     <div className="flex gap-3">
       {intents.map((item) => (
-        <Button
-          key={item.intent}
-          label={item.title}
-          variant="outline"
-          onClick={() => setOpenIntent(item.intent)}
-        />
+        <Button key={item.intent} label={item.title} variant="outline" onClick={() => setOpenIntent(item.intent)} />
       ))}
       {current && (
         <Modal
@@ -212,21 +138,11 @@ function ModalDemo() {
               label: current.action,
               variant: current.intent === "danger" ? "danger" : "primary",
               onClick: close,
-              iconLeft:
-                current.intent === "danger" ? (
-                  <X size={18} />
-                ) : (
-                  <Check size={18} />
-                ),
+              iconLeft: current.intent === "danger" ? <X size={18} /> : <Check size={18} />,
             },
           ]}
         >
-          {current.intent === "warning" && (
-            <Textarea
-              aria-label="Observación"
-              placeholder="Escribir observación…"
-            />
-          )}
+          {current.intent === "warning" && <Textarea aria-label="Observación" placeholder="Escribir observación…" />}
         </Modal>
       )}
     </div>
@@ -240,43 +156,18 @@ export const Modals: Story = {
 export const ToastTones: Story = {
   render: () => (
     <div className="flex max-w-sm flex-col gap-3">
-      <Toast
-        tone="success"
-        title="Comisión enviada"
-        message="Queda en Solicitada."
-        onClose={toast.clear}
-      />
-      <Toast
-        tone="error"
-        title="No se pudo enviar"
-        message="Revisar los campos marcados."
-        onClose={toast.clear}
-      />
-      <Toast
-        tone="warning"
-        title="Faltan documentos"
-        message="La carta de invitación es obligatoria."
-        onClose={toast.clear}
-      />
-      <Toast
-        tone="info"
-        title="Sesión por vencer"
-        message="Quedan 5 minutos."
-        onClose={toast.clear}
-      />
+      <Toast tone="success" title="Comisión enviada" message="Queda en Solicitada." onClose={toast.clear} />
+      <Toast tone="error" title="No se pudo enviar" message="Revisar los campos marcados." onClose={toast.clear} />
+      <Toast tone="warning" title="Faltan documentos" message="La carta de invitación es obligatoria." onClose={toast.clear} />
+      <Toast tone="info" title="Sesión por vencer" message="Quedan 5 minutos." onClose={toast.clear} />
     </div>
   ),
 };
 
 function ToasterDemo() {
-  const success = () =>
-    toast.success("Comisión enviada", { message: "Queda en Solicitada." });
-  const error = () =>
-    toast.error("No se pudo enviar", {
-      message: "Revisar los campos marcados.",
-    });
-  const info = () =>
-    toast.info("Sesión por vencer", { message: "Quedan 5 minutos." });
+  const success = () => toast.success("Comisión enviada", { message: "Queda en Solicitada." });
+  const error = () => toast.error("No se pudo enviar", { message: "Revisar los campos marcados." });
+  const info = () => toast.info("Sesión por vencer", { message: "Quedan 5 minutos." });
   return (
     <div className="flex gap-3">
       <Toaster />
@@ -297,27 +188,13 @@ export const EmptyStates: Story = {
       <EmptyState
         title="Sin comisiones por revisar"
         message="Las nuevas solicitudes aparecen aquí."
-        action={
-          <Button
-            label="Refrescar"
-            variant="outline"
-            size="sm"
-            iconLeft={<RefreshCw size={14} />}
-          />
-        }
+        action={<Button label="Refrescar" variant="outline" size="sm" iconLeft={<RefreshCw size={14} />} />}
       />
       <EmptyState
         compact
         title="Sin comisiones por revisar"
         message="Las nuevas solicitudes aparecen aquí."
-        action={
-          <Button
-            label="Refrescar"
-            variant="outline"
-            size="sm"
-            iconLeft={<RefreshCw size={14} />}
-          />
-        }
+        action={<Button label="Refrescar" variant="outline" size="sm" iconLeft={<RefreshCw size={14} />} />}
       />
     </div>
   ),
@@ -326,15 +203,7 @@ export const EmptyStates: Story = {
 function PaginationDemo() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  return (
-    <Pagination
-      page={page}
-      pageSize={pageSize}
-      total={24}
-      onPageChange={setPage}
-      onPageSizeChange={setPageSize}
-    />
-  );
+  return <Pagination page={page} pageSize={pageSize} total={24} onPageChange={setPage} onPageSizeChange={setPageSize} />;
 }
 
 export const Paginations: Story = {
@@ -342,7 +211,5 @@ export const Paginations: Story = {
 };
 
 export const SummaryCards: Story = {
-  render: () => (
-    <SummaryCard label="Resolución" value="C-0001-2026" icon={Stamp} />
-  ),
+  render: () => <SummaryCard label="Resolución" value="C-0001-2026" icon={Stamp} />,
 };
