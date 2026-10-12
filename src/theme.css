@@ -1,0 +1,116 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "./";
+
+@theme {
+  --color-brand-50: #edf6f1;
+  --color-brand-100: #d3e8de;
+  --color-brand-200: #a9d1bd;
+  --color-brand-300: #7fb99c;
+  --color-brand-400: #3f9467;
+  --color-brand-500: #1a7c4b;
+  --color-brand-600: #026937;
+  --color-brand-700: #01562d;
+  --color-brand-800: #014424;
+  --color-brand-900: #01361d;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+
+  --shadow-focus: 0 0 0 1px var(--color-brand-600), 0 0 0 4px color-mix(in srgb, var(--color-brand-200) 90%, transparent);
+  --shadow-focus-danger: 0 0 0 1px var(--color-red-600), 0 0 0 4px color-mix(in srgb, var(--color-red-200) 90%, transparent);
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-grow-x: grow-x 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pop-in: pop-in 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade-in: fade-in 0.2s ease-out both;
+  --animate-modal-in: modal-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-toast-in: toast-in 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-breathe: breathe 3.2s ease-in-out infinite;
+  --animate-shrink-x: shrink-x 4s linear forwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes shrink-x {
+    from {
+      transform: scaleX(1);
+    }
+    to {
+      transform: scaleX(0);
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.04);
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
