@@ -28,6 +28,24 @@ export function App() {
 }
 ```
 
+## REST API
+
+`useRestApi` is the only way the apps talk to their back end. `RestApiProvider` sets the base URL, the session headers, what to do on a 401 and, if needed, how to encode the body:
+
+```tsx
+const config = {
+  baseUrl: import.meta.env.VITE_API_URL,
+  getHeaders: buildAuthHeaders,
+  onUnauthorized: refreshSession,
+};
+
+<RestApiProvider config={config}>
+  <App />
+</RestApiProvider>;
+
+const { data, loading, doPost } = useRestApi<Room[]>(roomsApi.list);
+```
+
 ## Brand
 
 The brand palette lives in `--color-brand-50` … `--color-brand-900` (UdeA green by default). Another brand overrides those variables after importing the theme:
@@ -66,6 +84,8 @@ npm run build
 
 ## Release
 
-1. Raise `version` in `package.json` on `develop` and promote it to `main`.
+`main` is the only branch.
+
+1. Raise `version` in `package.json` together with the change.
 2. Create a GitHub release whose tag is `v<version>` on the head of `main`.
 3. The `Release` workflow checks the tag, runs the checks and publishes to npm through trusted publishing; it waits for approval in the `npm` environment.

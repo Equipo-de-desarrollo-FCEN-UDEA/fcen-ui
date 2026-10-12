@@ -57,3 +57,20 @@ export {
   type RecordStatus,
 } from "./components/records/RecordCard";
 export { RecordRow, type RecordRowProps } from "./components/records/RecordRow";
+export {
+  ApiError,
+  joinUrl,
+  requestJson,
+  type EncodedBody,
+  type HttpMethod,
+  type RequestContext,
+  type RestApiConfig,
+} from "./api/http";
+export { RestApiProvider, useRestApiConfig, type RestApiProviderProps } from "./api/RestApiProvider";
+export {
+  useRestApi,
+  type RequestOptions,
+  type RequestRecord,
+  type RestApiOptions,
+  type UseRestApiResult,
+} from "./api/useRestApi";
