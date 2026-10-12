@@ -10,14 +10,25 @@ const countries: SelectOptionItem[] = [
   { value: "PA", label: "Panamá", code: "PA" },
 ];
 
-function Controlled(props: { searchable?: boolean; initial?: string | null; onChange?: (value: string) => void }) {
+function Controlled(props: {
+  searchable?: boolean;
+  initial?: string | null;
+  onChange?: (value: string) => void;
+}) {
   const [value, setValue] = useState<string | null>(props.initial ?? null);
   const change = (next: string) => {
     setValue(next);
     props.onChange?.(next);
   };
   return (
-    <Select aria-label="País" options={countries} value={value} onChange={change} searchable={props.searchable} name="country" />
+    <Select
+      aria-label="País"
+      options={countries}
+      value={value}
+      onChange={change}
+      searchable={props.searchable}
+      name="country"
+    />
   );
 }
 
@@ -67,11 +78,20 @@ describe("Select", () => {
     control.focus();
 
     await userEvent.keyboard("{ArrowDown}");
-    expect(control).toHaveAttribute("aria-activedescendant", expect.stringContaining("option-1"));
-    expect(screen.getByRole("option", { name: /Portugal/ })).toHaveAttribute("aria-selected", "true");
+    expect(control).toHaveAttribute(
+      "aria-activedescendant",
+      expect.stringContaining("option-1"),
+    );
+    expect(screen.getByRole("option", { name: /Portugal/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
 
     await userEvent.keyboard("{ArrowDown}");
-    expect(control).toHaveAttribute("aria-activedescendant", expect.stringContaining("option-3"));
+    expect(control).toHaveAttribute(
+      "aria-activedescendant",
+      expect.stringContaining("option-3"),
+    );
 
     await userEvent.keyboard("{ArrowDown}{ArrowUp}{ArrowUp}{Home}{End}{Enter}");
     expect(onChange).toHaveBeenCalledWith("PA");
@@ -142,10 +162,47 @@ describe("Select", () => {
 
     await userEvent.clear(control);
     await userEvent.type(control, "pt");
-    expect(screen.getByRole("option", { name: /Portugal/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: /Portugal/ }),
+    ).toBeInTheDocument();
 
     await userEvent.keyboard("{Enter}");
     expect(onChange).toHaveBeenCalledWith("PT");
+  });
+
+  it("shows each description under its label and finds options by it", async () => {
+    const people: SelectOptionItem[] = [
+      {
+        value: "andres.rios",
+        label: "andres.rios",
+        description: "Director y profesor del Instituto de Física",
+      },
+      {
+        value: "laura.toro",
+        label: "laura.toro",
+        description: "Secretaria de la Decanatura",
+      },
+    ];
+    const onChange = vi.fn();
+    render(
+      <Select
+        aria-label="Persona"
+        options={people}
+        value={null}
+        onChange={onChange}
+        searchable
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("combobox"));
+    expect(
+      screen.getByRole("option", { name: /andres\.rios/ }),
+    ).toHaveTextContent("Director y profesor del Instituto de Física");
+
+    await userEvent.type(screen.getByRole("combobox"), "decanatura");
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    await userEvent.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith("laura.toro");
   });
 
   it("shows the empty text and types spaces when searchable", async () => {
@@ -162,28 +219,44 @@ describe("Select", () => {
   });
 
   it("does not open when disabled and marks the error state", async () => {
-    render(<Select aria-label="País" options={countries} value={null} onChange={vi.fn()} disabled state="error" />);
+    render(
+      <Select
+        aria-label="País"
+        options={countries}
+        value={null}
+        onChange={vi.fn()}
+        disabled
+        state="error"
+      />,
+    );
 
     await userEvent.click(screen.getByRole("combobox"));
 
     expect(screen.getByRole("combobox")).toBeDisabled();
-    expect(screen.getByRole("combobox")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
   it("flips the menu above when there is no room below and follows scroll", async () => {
-    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
-      top: 700,
-      bottom: 740,
-      left: 20,
-      right: 340,
-      width: 320,
-      height: 40,
-      x: 20,
-      y: 700,
-      toJSON: () => ({}),
-    });
-    const height = vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(200);
+    const spy = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockReturnValue({
+        top: 700,
+        bottom: 740,
+        left: 20,
+        right: 340,
+        width: 320,
+        height: 40,
+        x: 20,
+        y: 700,
+        toJSON: () => ({}),
+      });
+    const height = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockReturnValue(200);
     render(<Controlled />);
 
     await userEvent.click(screen.getByRole("combobox"));
