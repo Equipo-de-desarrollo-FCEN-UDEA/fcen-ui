@@ -88,4 +88,5 @@ npm run build
 
 1. Raise `version` in `package.json` together with the change.
 2. Create a GitHub release whose tag is `v<version>` on the head of `main`.
-3. The `Release` workflow checks the tag, runs the checks and publishes the version on npm through trusted publishing. It runs in the `npm` environment, which only accepts `v*` tags.
+3. The `Release` workflow checks the tag and waits in the `npm` environment, which only accepts `v*` tags, until one of its reviewers approves it on GitHub.
+4. Once approved, it runs the checks and publishes the version on npm through trusted publishing, with provenance.
