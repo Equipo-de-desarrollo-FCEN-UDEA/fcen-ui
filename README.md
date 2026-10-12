@@ -88,5 +88,4 @@ npm run build
 
 1. Raise `version` in `package.json` together with the change.
 2. Create a GitHub release whose tag is `v<version>` on the head of `main`.
-3. The `Release` workflow checks the tag, runs the checks and stages the version on npm through trusted publishing. It runs in the `npm` environment, which only accepts `v*` tags.
-4. A maintainer approves the staged version on npmjs.com or with `npm stage approve <stage-id>`, using two-factor authentication. Until then the version is not installable.
+3. The `Release` workflow checks the tag, runs the checks and publishes the version on npm through trusted publishing. It runs in the `npm` environment, which only accepts `v*` tags.
