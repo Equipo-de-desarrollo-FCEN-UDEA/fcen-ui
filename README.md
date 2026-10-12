@@ -30,13 +30,14 @@ export function App() {
 
 ## REST API
 
-`useRestApi` is the only way the apps talk to their back end. `RestApiProvider` sets the base URL, the session headers, what to do on a 401 and, if needed, how to encode the body:
+`useRestApi` is the only way the apps talk to their back end. `RestApiProvider` sets the base URL, the session headers and what to do on a 401. `prepare` runs before every request, retries included, and may replace the body, add headers and return the reader for that request's response, which is how an app encrypts a request and opens its answer with the same key:
 
 ```tsx
 const config = {
   baseUrl: import.meta.env.VITE_API_URL,
   getHeaders: buildAuthHeaders,
   onUnauthorized: refreshSession,
+  prepare: encryptWhenRequired,
 };
 
 <RestApiProvider config={config}>

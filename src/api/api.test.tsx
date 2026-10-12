@@ -86,20 +86,52 @@ describe("http helpers", () => {
     expect(headers.get("X-Device-Token")).toBe("device");
   });
 
-  it("encodes and decodes through the configured hooks", async () => {
-    fetchMock.mockResolvedValue(json({ sealed: "abc" }));
-    const encode = vi.fn().mockResolvedValue({ body: "cipher", headers: { "Content-Type": "text/plain", "X-Encrypted": "1" } });
-    const decode = vi.fn().mockResolvedValue({ plain: true });
+  it("lets each request prepare its own body, headers and response reader", async () => {
+    fetchMock.mockImplementation(async () => json({ sealed: "abc" }, 401));
+    const readResponse = vi.fn().mockResolvedValue({ detail: "Credenciales inválidas" });
+    const prepare = vi.fn().mockResolvedValue({
+      body: "cipher",
+      headers: { "Content-Type": "text/plain", "X-Encrypted-Key": "wrapped" },
+      readResponse,
+    });
 
-    const result = await requestJson({ encode, decode, credentials: "include" }, "POST", "/auth/login", { login: "x" });
+    const failure = requestJson({ prepare, credentials: "include" }, "POST", "/auth/login", { login: "x" });
 
-    expect(result).toEqual({ plain: true });
-    expect(encode).toHaveBeenCalledWith({ login: "x" }, { method: "POST", target: "/auth/login" });
-    expect(decode).toHaveBeenCalledWith({ sealed: "abc" }, expect.any(Response));
+    await expect(failure).rejects.toMatchObject({ status: 401, message: "Credenciales inválidas" });
+    expect(prepare).toHaveBeenCalledWith({ method: "POST", target: "/auth/login", body: { login: "x" } });
+    expect(readResponse).toHaveBeenCalledWith({ sealed: "abc" }, expect.any(Response));
     const init = fetchMock.mock.calls[0][1];
     expect(init?.body).toBe("cipher");
-    expect((init?.headers as Headers).get("X-Encrypted")).toBe("1");
+    expect((init?.headers as Headers).get("X-Encrypted-Key")).toBe("wrapped");
+    expect((init?.headers as Headers).get("Content-Type")).toBe("text/plain");
     expect(init?.credentials).toBe("include");
+  });
+
+  it("keeps the json body when prepare only adds headers", async () => {
+    fetchMock.mockImplementation(async () => json({ ok: true }));
+    const prepare = vi.fn().mockResolvedValue({ headers: { "X-Encrypted-Key": "wrapped" } });
+
+    await requestJson({ prepare }, "GET", "/auth/me");
+    await requestJson({ prepare: async () => undefined }, "POST", "/rooms", { name: "a" });
+
+    expect((fetchMock.mock.calls[0][1]?.headers as Headers).get("X-Encrypted-Key")).toBe("wrapped");
+    expect(fetchMock.mock.calls[0][1]?.body).toBeUndefined();
+    expect(fetchMock.mock.calls[1][1]?.body).toBe(JSON.stringify({ name: "a" }));
+  });
+
+  it("prepares the retry again after a refresh", async () => {
+    fetchMock.mockResolvedValueOnce(json({}, 401)).mockResolvedValueOnce(json({ sealed: "second" }));
+    let call = 0;
+    const prepare = vi.fn(async () => {
+      call += 1;
+      const current = call;
+      return { headers: { "X-Encrypted-Key": `key-${current}` }, readResponse: async () => ({ key: current }) };
+    });
+
+    const result = await requestJson({ prepare, onUnauthorized: async () => true }, "GET", "/auth/me");
+
+    expect(result).toEqual({ key: 2 });
+    expect((fetchMock.mock.calls[1][1]?.headers as Headers).get("X-Encrypted-Key")).toBe("key-2");
   });
 
   it("retries once after a successful refresh with the new headers", async () => {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ApiError, joinUrl, readPayload, requestJson, sendRequest, errorMessageOf, type HttpMethod } from "./http";
+import { joinUrl, readResult, requestJson, sendRequest, type HttpMethod } from "./http";
 import { useRestApiConfig } from "./RestApiProvider";
 
 export type RequestRecord<TAnnotation = unknown> = {
@@ -112,11 +112,9 @@ export function useRestApi<TResponse = unknown, TError = string>(
     async (target: string, filename: string) => {
       setPending((count) => count + 1);
       try {
-        const response = await sendRequest(config, "GET", target);
-        if (!response.ok) {
-          const payload = await readPayload(response);
-          throw new ApiError(errorMessageOf(payload, response.status), response.status, payload);
-        }
+        const sent = await sendRequest(config, "GET", target);
+        const { response } = sent;
+        if (!response.ok) await readResult(sent);
         const objectUrl = URL.createObjectURL(await response.blob());
         const anchor = document.createElement("a");
         anchor.href = objectUrl;

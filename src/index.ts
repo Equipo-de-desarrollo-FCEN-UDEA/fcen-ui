@@ -60,11 +60,15 @@ export { RecordRow, type RecordRowProps } from "./components/records/RecordRow";
 export {
   ApiError,
   joinUrl,
+  readResult,
   requestJson,
-  type EncodedBody,
+  sendRequest,
   type HttpMethod,
+  type PreparedRequest,
   type RequestContext,
+  type ResponseReader,
   type RestApiConfig,
+  type SentRequest,
 } from "./api/http";
 export { RestApiProvider, useRestApiConfig, type RestApiProviderProps } from "./api/RestApiProvider";
 export {

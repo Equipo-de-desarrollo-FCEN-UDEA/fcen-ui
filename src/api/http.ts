@@ -1,13 +1,17 @@
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export type EncodedBody = {
-  body: BodyInit;
-  headers?: Record<string, string>;
-};
-
 export type RequestContext = {
   method: HttpMethod;
   target: string;
+  body?: unknown;
+};
+
+export type ResponseReader = (payload: unknown, response: Response) => Promise<unknown>;
+
+export type PreparedRequest = {
+  body?: BodyInit;
+  headers?: Record<string, string>;
+  readResponse?: ResponseReader;
 };
 
 export type RestApiConfig = {
@@ -15,8 +19,12 @@ export type RestApiConfig = {
   credentials?: RequestCredentials;
   getHeaders?: () => Record<string, string> | Promise<Record<string, string>>;
   onUnauthorized?: (requestHeaders: Record<string, string>) => Promise<boolean>;
-  encode?: (body: unknown, context: RequestContext) => Promise<EncodedBody>;
-  decode?: (payload: unknown, response: Response) => Promise<unknown>;
+  prepare?: (request: RequestContext) => Promise<PreparedRequest | undefined>;
+};
+
+export type SentRequest = {
+  response: Response;
+  readResponse?: ResponseReader;
 };
 
 export class ApiError extends Error {
@@ -81,28 +89,30 @@ export function errorMessageOf(payload: unknown, status: number): string {
   );
 }
 
-async function buildInit(
+type BuiltRequest = {
+  init: RequestInit;
+  readResponse?: ResponseReader;
+};
+
+async function buildRequest(
   config: RestApiConfig,
-  method: HttpMethod,
-  target: string,
-  body: unknown,
+  context: RequestContext,
   extraHeaders: Record<string, string>,
   baseHeaders: Record<string, string>,
-): Promise<RequestInit> {
+): Promise<BuiltRequest> {
   const headers = new Headers(baseHeaders);
-  let payload: BodyInit | undefined;
-  if (body !== undefined && body !== null) {
-    if (config.encode) {
-      const encoded = await config.encode(body, { method, target });
-      payload = encoded.body;
-      for (const [name, value] of Object.entries(encoded.headers ?? {})) headers.set(name, value);
-    } else {
-      headers.set("Content-Type", "application/json");
-      payload = JSON.stringify(body);
-    }
+  const prepared = config.prepare ? await config.prepare(context) : undefined;
+  let payload: BodyInit | undefined = prepared?.body;
+  if (payload === undefined && context.body !== undefined && context.body !== null) {
+    headers.set("Content-Type", "application/json");
+    payload = JSON.stringify(context.body);
   }
+  for (const [name, value] of Object.entries(prepared?.headers ?? {})) headers.set(name, value);
   for (const [name, value] of Object.entries(extraHeaders)) headers.set(name, value);
-  return { method, headers, body: payload, credentials: config.credentials ?? "same-origin" };
+  return {
+    init: { method: context.method, headers, body: payload, credentials: config.credentials ?? "same-origin" },
+    readResponse: prepared?.readResponse,
+  };
 }
 
 export async function sendRequest(
@@ -111,13 +121,25 @@ export async function sendRequest(
   target: string,
   body?: unknown,
   extraHeaders: Record<string, string> = {},
-): Promise<Response> {
+): Promise<SentRequest> {
   const url = joinUrl(config.baseUrl ?? "", target);
+  const context: RequestContext = { method, target, body };
   const firstHeaders = config.getHeaders ? await config.getHeaders() : {};
-  const response = await fetch(url, await buildInit(config, method, target, body, extraHeaders, firstHeaders));
-  if (response.status !== 401 || !config.onUnauthorized || !(await config.onUnauthorized(firstHeaders))) return response;
+  const first = await buildRequest(config, context, extraHeaders, firstHeaders);
+  const response = await fetch(url, first.init);
+  if (response.status !== 401 || !config.onUnauthorized || !(await config.onUnauthorized(firstHeaders))) {
+    return { response, readResponse: first.readResponse };
+  }
   const retryHeaders = config.getHeaders ? await config.getHeaders() : {};
-  return fetch(url, await buildInit(config, method, target, body, extraHeaders, retryHeaders));
+  const retry = await buildRequest(config, context, extraHeaders, retryHeaders);
+  return { response: await fetch(url, retry.init), readResponse: retry.readResponse };
+}
+
+export async function readResult({ response, readResponse }: SentRequest): Promise<unknown> {
+  const raw = await readPayload(response);
+  const payload = readResponse ? await readResponse(raw, response) : raw;
+  if (!response.ok) throw new ApiError(errorMessageOf(payload, response.status), response.status, payload);
+  return payload;
 }
 
 export async function requestJson(
@@ -127,9 +149,5 @@ export async function requestJson(
   body?: unknown,
   extraHeaders?: Record<string, string>,
 ): Promise<unknown> {
-  const response = await sendRequest(config, method, target, body, extraHeaders);
-  const raw = await readPayload(response);
-  const payload = config.decode ? await config.decode(raw, response) : raw;
-  if (!response.ok) throw new ApiError(errorMessageOf(payload, response.status), response.status, payload);
-  return payload;
+  return readResult(await sendRequest(config, method, target, body, extraHeaders));
 }
