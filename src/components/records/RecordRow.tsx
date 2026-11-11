@@ -1,9 +1,10 @@
-import { ChevronRight, Clock, Paperclip } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 import clsx from "clsx";
 import { Avatar } from "../atoms/Avatar";
 import { StatusBadge } from "../atoms/StatusBadge";
 import { tones } from "../../theme/tones";
 import type { RecordMeta, RecordStatus } from "./RecordCard";
+import { DocumentCount } from "./DocumentCount";
 
 export type RecordRowProps = {
   person?: { name: string; detail?: string };
@@ -28,25 +29,6 @@ const COLUMNS = {
 function columnsOf(hasPerson: boolean, hasDocuments: boolean): string {
   if (hasPerson) return hasDocuments ? COLUMNS.personDocuments : COLUMNS.person;
   return hasDocuments ? COLUMNS.documents : COLUMNS.plain;
-}
-
-function Documents({ count }: { count: number | null }) {
-  if (count === null) return null;
-  if (count === 0) {
-    return (
-      <span className="text-sm text-gray-400 dark:text-gray-500">
-        <span aria-hidden>—</span>
-        <span className="sr-only">Sin documentos</span>
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-200">
-      <Paperclip size={14} aria-hidden className="shrink-0 text-gray-500 dark:text-gray-400" />
-      {count}
-      <span className="sr-only">{count === 1 ? " documento" : " documentos"}</span>
-    </span>
-  );
 }
 
 export const RecordRow = ({
@@ -115,7 +97,7 @@ export const RecordRow = ({
       </span>
       {documents !== undefined && (
         <span className="col-start-2 md:col-start-auto">
-          <Documents count={documents} />
+          <DocumentCount count={documents} />
         </span>
       )}
       <span className="col-start-3 row-start-1 md:col-start-auto md:row-start-auto">
