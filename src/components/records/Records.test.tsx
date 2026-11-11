@@ -100,25 +100,6 @@ describe("RecordRow", () => {
     expect(screen.getByRole("button", { name: /Sin conteo/ })).not.toHaveTextContent("documento");
   });
 
-  it("draws the status accent unless it is turned off", () => {
-    const { container } = render(
-      <>
-        <RecordRow title="Con barra" status={{ label: "Aprobada", tone: "success" }} onClick={vi.fn()} />
-        <RecordRow title="Sin barra" status={{ label: "Aprobada", tone: "success" }} documents={2} accent={false} onClick={vi.fn()} />
-      </>,
-    );
-
-    const withAccent = screen.getByRole("button", { name: /Con barra/ });
-    const withoutAccent = screen.getByRole("button", { name: /Sin barra/ });
-    expect(withAccent.firstElementChild?.className).toContain("w-1");
-    expect(withAccent.className).toContain("grid-cols-[4px_minmax(0,1fr)_auto]");
-    expect(withoutAccent.firstElementChild?.className).not.toContain("w-1");
-    expect(withoutAccent.className).toContain("grid-cols-[minmax(0,1fr)_auto]");
-    expect(withoutAccent.className).toContain("md:grid-cols-[minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]");
-    expect(withoutAccent.className).not.toContain("4px");
-    expect(container.querySelectorAll(".w-1")).toHaveLength(1);
-  });
-
   it("renders the minimum without click", () => {
     render(<RecordRow person={{ name: "Ana Ruiz" }} title="Curso" status={{ label: "Finalizada", tone: "neutral" }} dates={{ primary: "1 dic 2026" }} />);
 

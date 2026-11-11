@@ -57,6 +57,22 @@ export {
   type RecordStatus,
 } from "./components/records/RecordCard";
 export { RecordRow, type RecordRowProps } from "./components/records/RecordRow";
+export { DocumentCount, type DocumentCountProps } from "./components/records/DocumentCount";
+export {
+  Table,
+  TableRow,
+  type TableColumn,
+  type TableProps,
+  type TableRowProps,
+} from "./components/table/Table";
+export {
+  TablePerson,
+  TableText,
+  TableTitle,
+  type TablePersonProps,
+  type TableTextProps,
+  type TableTitleProps,
+} from "./components/table/TableCells";
 export {
   ApiError,
   joinUrl,
