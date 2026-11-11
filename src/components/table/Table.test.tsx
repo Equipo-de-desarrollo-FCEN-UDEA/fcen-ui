@@ -44,6 +44,21 @@ describe("Table", () => {
     expect(screen.getAllByRole("button")).toHaveLength(1);
     expect(screen.getByText("Sin clic").parentElement?.tagName).toBe("DIV");
   });
+  it("centers the header and the cells of a centered column", () => {
+    const { container } = render(
+      <Table columns={[{ label: "Asunto" }, { label: "Documentos", width: "120px", align: "center" }]}>
+        <TableRow>
+          <TableText>Congreso</TableText>
+          <TableText>2</TableText>
+        </TableRow>
+      </Table>,
+    );
+
+    const rows = container.firstElementChild?.lastElementChild as HTMLElement;
+    expect(screen.getByText("Documentos").className).toContain("justify-self-center");
+    expect(screen.getByText("Asunto").className).not.toContain("justify-self-center");
+    expect(rows.className).toBe("@5xl:[&>*>:nth-child(2)]:justify-self-center");
+  });
 });
 
 describe("Table cells", () => {

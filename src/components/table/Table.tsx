@@ -4,6 +4,7 @@ import clsx from "clsx";
 export type TableColumn = {
   label: string;
   width?: string;
+  align?: "start" | "center";
 };
 
 export type TableProps = {
@@ -20,6 +21,23 @@ export type TableRowProps = {
 };
 
 const COLUMNS_CLASS = "@5xl:grid-cols-(--table-columns)";
+
+const CENTERED_CELLS = [
+  "@5xl:[&>*>:nth-child(1)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(2)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(3)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(4)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(5)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(6)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(7)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(8)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(9)]:justify-self-center",
+  "@5xl:[&>*>:nth-child(10)]:justify-self-center",
+];
+
+function centeredCells(columns: TableColumn[]): string[] {
+  return columns.flatMap((column, index) => (column.align === "center" ? [CENTERED_CELLS[index]] : []));
+}
 
 function templateOf(columns: TableColumn[]): CSSProperties {
   const template = columns.map((column) => column.width ?? "minmax(0,1fr)").join(" ");
@@ -42,10 +60,12 @@ export const Table = ({ columns, children, className }: TableProps) => (
       )}
     >
       {columns.map((column) => (
-        <span key={column.label}>{column.label}</span>
+        <span key={column.label} className={clsx(column.align === "center" && "justify-self-center")}>
+          {column.label}
+        </span>
       ))}
     </div>
-    <div>{children}</div>
+    <div className={clsx(centeredCells(columns))}>{children}</div>
   </div>
 );
 

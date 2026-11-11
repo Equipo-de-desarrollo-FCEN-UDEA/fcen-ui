@@ -78,7 +78,7 @@ const commissionColumns: TableColumn[] = [
   { label: "Asunto" },
   { label: "Fechas", width: "220px" },
   { label: "Estado", width: "140px" },
-  { label: "Documentos", width: "120px" },
+  { label: "Documentos", width: "120px", align: "center" },
 ];
 
 export const Faculty: Story = {
