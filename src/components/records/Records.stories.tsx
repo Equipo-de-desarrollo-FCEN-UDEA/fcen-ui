@@ -100,3 +100,23 @@ export const RowsWithDocuments: Story = {
     </div>
   ),
 };
+
+export const RowsWithoutAccent: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      {cards.map((card, index) => (
+        <RecordRow
+          key={card.label}
+          title="Congreso Latinoamericano de Física Estadística"
+          place={place}
+          dates={{ primary: "14 – 18 nov 2026" }}
+          status={{ label: card.label, tone: card.tone }}
+          documents={index % 3}
+          accent={false}
+          onClick={ignore}
+          order={index}
+        />
+      ))}
+    </div>
+  ),
+};
