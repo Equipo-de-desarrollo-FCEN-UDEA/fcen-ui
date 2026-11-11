@@ -67,3 +67,36 @@ export const Rows: Story = {
     </div>
   ),
 };
+
+export const RowsWithDocuments: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <RecordRow
+        person={{ name: "Juan Giraldo" }}
+        title="Congreso de Física Médica"
+        place={{ icon: MapPin, text: "Bogotá, Colombia" }}
+        dates={{ primary: "2 – 5 dic 2025" }}
+        status={{ label: "Aprobada", tone: "success" }}
+        documents={2}
+        onClick={ignore}
+      />
+      <RecordRow
+        title="Taller de Óptica No Lineal"
+        place={{ icon: MapPin, text: "Medellín, Colombia" }}
+        dates={{ primary: "3 – 7 jul 2023" }}
+        status={{ label: "Devuelta", tone: "warning" }}
+        documents={1}
+        onClick={ignore}
+        order={1}
+      />
+      <RecordRow
+        title="Carga histórica"
+        dates={{ primary: "Resolución del 12 ago 2019" }}
+        status={{ label: "Finalizada", tone: "neutral" }}
+        documents={0}
+        onClick={ignore}
+        order={2}
+      />
+    </div>
+  ),
+};

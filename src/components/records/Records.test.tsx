@@ -71,6 +71,35 @@ describe("RecordRow", () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
+  it("leaves the person out when there is none", () => {
+    render(<RecordRow title="Escuela de Física Computacional" status={{ label: "Finalizada", tone: "neutral" }} onClick={vi.fn()} />);
+
+    const row = screen.getByRole("button", { name: /Escuela de Física Computacional/ });
+    expect(row.className).toContain("md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_auto]");
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("counts the documents in their own column", () => {
+    render(
+      <>
+        <RecordRow person={{ name: "Juan Giraldo" }} title="Con dos" status={{ label: "Aprobada", tone: "success" }} documents={2} />
+        <RecordRow title="Con uno" status={{ label: "Aprobada", tone: "success" }} documents={1} />
+        <RecordRow title="Sin documentos" status={{ label: "Finalizada", tone: "neutral" }} documents={0} />
+        <RecordRow title="Sin conteo" status={{ label: "Solicitada", tone: "info" }} documents={null} />
+      </>,
+    );
+
+    const withTwo = screen.getByRole("button", { name: /Con dos/ });
+    expect(withTwo).toHaveTextContent("2 documentos");
+    expect(withTwo.className).toContain("md:grid-cols-[4px_minmax(0,16rem)_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]");
+    expect(screen.getByRole("button", { name: /Con uno/ }).className).toContain(
+      "md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]",
+    );
+    expect(screen.getByRole("button", { name: /Con uno/ })).toHaveTextContent("1 documento");
+    expect(screen.getByRole("button", { name: /Sin documentos/ })).toHaveTextContent("—");
+    expect(screen.getByRole("button", { name: /Sin conteo/ })).not.toHaveTextContent("documento");
+  });
+
   it("renders the minimum without click", () => {
     render(<RecordRow person={{ name: "Ana Ruiz" }} title="Curso" status={{ label: "Finalizada", tone: "neutral" }} dates={{ primary: "1 dic 2026" }} />);
 
