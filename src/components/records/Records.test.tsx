@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { Calendar, MapPin, Undo2 } from "lucide-react";
 import { RecordCard } from "./RecordCard";
 import { RecordRow } from "./RecordRow";
-import { RecordTableHeader } from "./RecordTableHeader";
 
 describe("RecordCard", () => {
   it("shows the status, code, meta, progress, note and footer and opens on click", async () => {
@@ -76,7 +75,7 @@ describe("RecordRow", () => {
     render(<RecordRow title="Escuela de Física Computacional" status={{ label: "Finalizada", tone: "neutral" }} onClick={vi.fn()} />);
 
     const row = screen.getByRole("button", { name: /Escuela de Física Computacional/ });
-    expect(row.style.getPropertyValue("--record-columns")).toBe("4px minmax(0,1fr) 10rem 8rem 8rem auto");
+    expect(row.className).toContain("md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_auto]");
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
@@ -92,8 +91,9 @@ describe("RecordRow", () => {
 
     const withTwo = screen.getByRole("button", { name: /Con dos/ });
     expect(withTwo).toHaveTextContent("2 documentos");
-    expect(withTwo.style.getPropertyValue("--record-columns")).toBe(
-      "4px minmax(0,16rem) minmax(0,1fr) 10rem 8rem 8rem 6rem auto",
+    expect(withTwo.className).toContain("md:grid-cols-[4px_minmax(0,16rem)_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]");
+    expect(screen.getByRole("button", { name: /Con uno/ }).className).toContain(
+      "md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]",
     );
     expect(screen.getByRole("button", { name: /Con uno/ })).toHaveTextContent("1 documento");
     expect(screen.getByRole("button", { name: /Sin documentos/ })).toHaveTextContent("—");
@@ -105,57 +105,5 @@ describe("RecordRow", () => {
 
     expect(screen.getByRole("button", { name: /Ana Ruiz/ })).toBeDisabled();
     expect(screen.queryByText("Hace 3 días")).not.toBeInTheDocument();
-  });
-});
-
-describe("RecordRow as a table row", () => {
-  it("lines the header up with the rows", () => {
-    render(
-      <>
-        <RecordTableHeader labels={{ person: "Profesor", title: "Asunto", dates: "Fechas", status: "Estado", documents: "Documentos" }} />
-        <RecordRow
-          variant="table"
-          person={{ name: "Juan Giraldo" }}
-          title="Congreso de Física Médica"
-          place={{ icon: MapPin, text: "Bogotá, Colombia" }}
-          dates={{ primary: "2 – 5 dic 2025" }}
-          status={{ label: "Aprobada", tone: "success" }}
-          documents={2}
-          onClick={vi.fn()}
-        />
-      </>,
-    );
-
-    const row = screen.getByRole("button", { name: /Congreso de Física Médica/ });
-    const header = screen.getByText("Profesor").parentElement as HTMLElement;
-    expect(header).toHaveTextContent("ProfesorAsuntoFechasEstadoDocumentos");
-    expect(header.style.getPropertyValue("--record-columns")).toBe(row.style.getPropertyValue("--record-columns"));
-    expect(row.style.getPropertyValue("--record-columns")).toBe("220px minmax(0,1fr) 220px 140px 120px");
-    expect(row).toHaveTextContent("Bogotá, Colombia");
-    expect(row).toHaveTextContent("2 documentos");
-  });
-
-  it("leaves the person, the waiting time and the documents out unless named", () => {
-    render(
-      <>
-        <RecordTableHeader labels={{ title: "Asunto", dates: "Fechas", waiting: "Espera", status: "Estado" }} />
-        <RecordRow variant="table" title="Taller" status={{ label: "Devuelta", tone: "warning" }} waiting="Hace 2 días" />
-      </>,
-    );
-
-    const row = screen.getByRole("button", { name: /Taller/ });
-    expect(row.style.getPropertyValue("--record-columns")).toBe("minmax(0,1fr) 220px 8rem 140px");
-    expect(row).toHaveTextContent("Hace 2 días");
-    expect(row).toBeDisabled();
-  });
-
-  it("stripes and mutes the rows that ask for it", () => {
-    render(
-      <RecordRow variant="table" title="Carga histórica" status={{ label: "Finalizada", tone: "neutral" }} striped muted onClick={vi.fn()} />,
-    );
-
-    const row = screen.getByRole("button", { name: /Carga histórica/ });
-    expect(row.className).toContain("bg-slate-50");
-    expect(screen.getByText("Carga histórica").parentElement?.className).toContain("text-gray-500");
   });
 });

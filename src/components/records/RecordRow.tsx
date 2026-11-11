@@ -4,9 +4,6 @@ import { Avatar } from "../atoms/Avatar";
 import { StatusBadge } from "../atoms/StatusBadge";
 import { tones } from "../../theme/tones";
 import type { RecordMeta, RecordStatus } from "./RecordCard";
-import { cardColumns, columnsStyle, COLUMNS_CLASS, tableColumns } from "./recordColumns";
-
-export type RecordRowVariant = "card" | "table";
 
 export type RecordRowProps = {
   person?: { name: string; detail?: string };
@@ -16,16 +13,25 @@ export type RecordRowProps = {
   dates?: { primary: string; secondary?: string };
   waiting?: string;
   documents?: number | null;
-  variant?: RecordRowVariant;
-  striped?: boolean;
-  muted?: boolean;
   onClick?: () => void;
   order?: number;
   className?: string;
 };
 
+const COLUMNS = {
+  person: "md:grid-cols-[4px_minmax(0,16rem)_minmax(0,1fr)_10rem_8rem_8rem_auto]",
+  personDocuments: "md:grid-cols-[4px_minmax(0,16rem)_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]",
+  plain: "md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_auto]",
+  documents: "md:grid-cols-[4px_minmax(0,1fr)_10rem_8rem_8rem_6rem_auto]",
+};
+
+function columnsOf(hasPerson: boolean, hasDocuments: boolean): string {
+  if (hasPerson) return hasDocuments ? COLUMNS.personDocuments : COLUMNS.person;
+  return hasDocuments ? COLUMNS.documents : COLUMNS.plain;
+}
+
 function Documents({ count }: { count: number | null }) {
-  if (count === null) return <span aria-hidden />;
+  if (count === null) return null;
   if (count === 0) {
     return (
       <span className="text-sm text-gray-400 dark:text-gray-500">
@@ -43,7 +49,7 @@ function Documents({ count }: { count: number | null }) {
   );
 }
 
-function TableRow({
+export const RecordRow = ({
   person,
   title,
   status,
@@ -51,79 +57,21 @@ function TableRow({
   dates,
   waiting,
   documents,
-  striped = false,
-  muted = false,
   onClick,
   order = 0,
   className,
-}: RecordRowProps) {
-  const columns = tableColumns({
-    person: person !== undefined,
-    waiting: waiting !== undefined,
-    documents: documents !== undefined,
-  });
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!onClick}
-      style={{ animationDelay: `${order * 50}ms`, ...columnsStyle(columns) }}
-      className={clsx(
-        "grid w-full grid-cols-1 items-center gap-x-4 gap-y-2 border-b border-gray-100 px-6 py-3.5 text-left transition-colors motion-safe:animate-fade-up focus:outline-none focus-visible:bg-brand-50 disabled:cursor-default enabled:cursor-pointer enabled:hover:bg-brand-50 dark:border-slate-800 dark:focus-visible:bg-brand-500/10 dark:enabled:hover:bg-brand-500/10",
-        COLUMNS_CLASS,
-        striped ? "bg-slate-50 dark:bg-slate-800/40" : "bg-white dark:bg-slate-900",
-        className,
-      )}
-    >
-      {person && (
-        <span className="flex min-w-0 items-center gap-2.5">
-          <Avatar name={person.name} />
-          <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{person.name}</span>
-            {person.detail && <span className="truncate text-xs text-gray-500 dark:text-gray-400">{person.detail}</span>}
-          </span>
-        </span>
-      )}
-      <span
-        className={clsx(
-          "flex min-w-0 flex-col gap-0.5",
-          muted ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-gray-100",
-        )}
-      >
-        <span className="truncate text-sm font-semibold">{title}</span>
-        {place && <span className="truncate text-xs text-gray-500 dark:text-gray-400">{place.text}</span>}
-      </span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        {dates && (
-          <>
-            <span className="text-sm text-gray-700 dark:text-gray-300">{dates.primary}</span>
-            {dates.secondary && <span className="text-xs text-gray-500 dark:text-gray-400">{dates.secondary}</span>}
-          </>
-        )}
-      </span>
-      {waiting !== undefined && <span className="text-xs text-gray-500 dark:text-gray-400">{waiting}</span>}
-      <span>
-        <StatusBadge label={status.label} tone={status.tone} />
-      </span>
-      {documents !== undefined && <Documents count={documents} />}
-    </button>
-  );
-}
-
-function CardRow({ person, title, status, place, dates, waiting, documents, onClick, order = 0, className }: RecordRowProps) {
+}: RecordRowProps) => {
   const PlaceIcon = place?.icon;
-  const columns = cardColumns({ person: person !== undefined, documents: documents !== undefined });
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      style={{ animationDelay: `${order * 50}ms`, ...columnsStyle(columns) }}
+      style={{ animationDelay: `${order * 50}ms` }}
       className={clsx(
         "group grid w-full grid-cols-[4px_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 motion-safe:animate-fade-up disabled:cursor-default enabled:cursor-pointer enabled:hover:border-brand-200 enabled:hover:bg-brand-50 enabled:hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:enabled:hover:bg-brand-500/10",
-        COLUMNS_CLASS,
+        columnsOf(person !== undefined, documents !== undefined),
         className,
       )}
     >
@@ -179,7 +127,4 @@ function CardRow({ person, title, status, place, dates, waiting, documents, onCl
       </span>
     </button>
   );
-}
-
-export const RecordRow = ({ variant = "card", ...props }: RecordRowProps) =>
-  variant === "table" ? <TableRow {...props} /> : <CardRow {...props} />;
+};

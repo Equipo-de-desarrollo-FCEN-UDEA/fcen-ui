@@ -56,8 +56,7 @@ export {
   type RecordNote,
   type RecordStatus,
 } from "./components/records/RecordCard";
-export { RecordRow, type RecordRowProps, type RecordRowVariant } from "./components/records/RecordRow";
-export { RecordTableHeader, type RecordTableHeaderProps } from "./components/records/RecordTableHeader";
+export { RecordRow, type RecordRowProps } from "./components/records/RecordRow";
 export {
   ApiError,
   joinUrl,
