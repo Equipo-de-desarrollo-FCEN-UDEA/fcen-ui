@@ -85,7 +85,8 @@ describe("Pagination", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Anterior" }));
     await userEvent.click(screen.getByRole("button", { name: "Siguiente" }));
-    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Página" }), "3");
+    await userEvent.click(screen.getByRole("combobox", { name: "Página" }));
+    await userEvent.click(screen.getByRole("option", { name: "3" }));
 
     expect(onPageChange.mock.calls).toEqual([[1], [3], [3]]);
     expect(screen.queryByRole("combobox", { name: "Por página" })).not.toBeInTheDocument();
@@ -101,8 +102,80 @@ describe("Pagination", () => {
     expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
 
-    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Por página" }), "20");
+    await userEvent.click(screen.getByRole("combobox", { name: "Por página" }));
+    await userEvent.click(screen.getByRole("option", { name: "20" }));
 
     expect(onPageSizeChange).toHaveBeenCalledWith(20);
+  });
+
+  it("lists every page but shows five at a time", async () => {
+    render(<Pagination page={120} pageSize={10} total={3667} onPageChange={vi.fn()} />);
+
+    expect(screen.getByText("Mostrando 1.191–1.200 de 3.667")).toBeInTheDocument();
+    expect(screen.getByText("de 367")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("combobox", { name: "Página" }));
+
+    const list = screen.getByRole("listbox", { name: "Página" });
+    expect(list.style.maxHeight).toBe("172px");
+    expect(screen.getAllByRole("option")).toHaveLength(367);
+    expect(screen.getByRole("option", { name: "120" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("moves through the pages with the keyboard", async () => {
+    const onPageChange = vi.fn();
+    render(<Pagination page={120} pageSize={10} total={3667} onPageChange={onPageChange} />);
+    const trigger = screen.getByRole("combobox", { name: "Página" });
+    const active = () => document.getElementById(trigger.getAttribute("aria-activedescendant") ?? "")?.textContent;
+
+    trigger.focus();
+    await userEvent.keyboard("a");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.keyboard("{ArrowDown}");
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(active()).toBe("120");
+
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowUp}");
+    expect(active()).toBe("121");
+    await userEvent.keyboard("{End}");
+    expect(active()).toBe("367");
+    await userEvent.keyboard("{Home}");
+    expect(active()).toBe("1");
+    await userEvent.keyboard("{Escape}");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.keyboard(" {ArrowDown}{Enter}");
+    expect(onPageChange).toHaveBeenCalledWith(121);
+  });
+
+  it("closes without changing the page on the same page or outside", async () => {
+    const onPageChange = vi.fn();
+    render(<Pagination page={2} pageSize={10} total={24} onPageChange={onPageChange} />);
+    const trigger = screen.getByRole("combobox", { name: "Página" });
+
+    await userEvent.click(trigger);
+    await userEvent.hover(screen.getByRole("option", { name: "3" }));
+    expect(trigger.getAttribute("aria-activedescendant")).toMatch(/-2$/);
+    await userEvent.click(screen.getByRole("option", { name: "2" }));
+    await userEvent.click(trigger);
+    await userEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(trigger);
+    await userEvent.click(document.body);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
+
+  it("opens upwards when there is room above the pagination", async () => {
+    const rect = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({ top: 600 } as DOMRect);
+    render(<Pagination page={1} pageSize={10} total={24} onPageChange={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole("combobox", { name: "Página" }));
+
+    expect(screen.getByRole("listbox", { name: "Página" }).className).toContain("bottom-full");
+    rect.mockRestore();
   });
 });
