@@ -210,6 +210,20 @@ export const Paginations: Story = {
   render: () => <PaginationDemo />,
 };
 
+function ManyPagesDemo() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  return (
+    <div className="pt-52">
+      <Pagination page={page} pageSize={pageSize} total={3667} onPageChange={setPage} onPageSizeChange={setPageSize} />
+    </div>
+  );
+}
+
+export const PaginationWithManyPages: Story = {
+  render: () => <ManyPagesDemo />,
+};
+
 export const SummaryCards: Story = {
   render: () => <SummaryCard label="Resolución" value="C-0001-2026" icon={Stamp} />,
 };
