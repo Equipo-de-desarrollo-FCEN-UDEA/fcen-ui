@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Avatar } from "./Avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "./Card";
 import { Chip } from "./Chip";
 import { CodePill } from "./CodePill";
+import { CountryFlag } from "./CountryFlag";
 import { Label } from "./Label";
 import { PingDot } from "./PingDot";
 import { Spinner } from "./Spinner";
@@ -80,6 +82,25 @@ export const Labels: Story = {
       <Label text="Asunto" required />
       <Label text="Notas" />
     </div>
+  ),
+};
+
+export const CountryFlags: Story = {
+  render: () => (
+    <div className="flex items-center gap-4 text-sm text-gray-700 dark:text-gray-200">
+      <span className="inline-flex items-center gap-2"><CountryFlag country="CO" /> Colombia</span>
+      <span className="inline-flex items-center gap-2"><CountryFlag country="PE" /> Perú</span>
+      <span className="inline-flex items-center gap-2"><CountryFlag country="US" /> Estados Unidos</span>
+    </div>
+  ),
+};
+
+export const Cards: Story = {
+  render: () => (
+    <Card className="max-w-md">
+      <CardHeader><CardTitle>Laboratorio de Física</CardTitle></CardHeader>
+      <CardContent>Bloque 6 · Salón 104</CardContent>
+    </Card>
   ),
 };
 

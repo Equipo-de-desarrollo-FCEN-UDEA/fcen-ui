@@ -29,6 +29,7 @@ export type ModalProps = {
   size?: ModalSize;
   children?: ReactNode;
   actions?: ModalAction[];
+  showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
   closeLabel?: string;
   className?: string;
@@ -63,6 +64,7 @@ export const Modal = ({
   size = "md",
   children,
   actions,
+  showCloseButton = true,
   closeOnBackdropClick = true,
   closeLabel = "Cerrar",
   className,
@@ -164,15 +166,17 @@ export const Modal = ({
                 </div>
               )}
             </div>
-            <button
-              type="button"
-              data-modal-close="true"
-              onClick={onClose}
-              aria-label={closeLabel}
-              className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-[10px] text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:hover:bg-slate-800 dark:hover:text-gray-300"
-            >
-              <X size={16} aria-hidden />
-            </button>
+            {showCloseButton && (
+              <button
+                type="button"
+                data-modal-close="true"
+                onClick={onClose}
+                aria-label={closeLabel}
+                className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-[10px] text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:hover:bg-slate-800 dark:hover:text-gray-300"
+              >
+                <X size={16} aria-hidden />
+              </button>
+            )}
           </div>
           {children && <div className="flex-1 overflow-y-auto px-6 pt-1 pb-6">{children}</div>}
           {actions && actions.length > 0 && (

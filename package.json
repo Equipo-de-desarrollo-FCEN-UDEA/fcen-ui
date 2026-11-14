@@ -1,6 +1,6 @@
 {
   "name": "@fcen-udea/ui",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "React component library of the FCEN UdeA development team",
   "license": "MIT",
   "type": "module",
@@ -43,6 +43,8 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "country-flag-icons": "^1.6.20",
+    "libphonenumber-js": "^1.13.14",
     "lucide-react": "^0.552.0"
   },
   "devDependencies": {

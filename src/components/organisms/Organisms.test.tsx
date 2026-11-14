@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Briefcase, Building2, MonitorSmartphone } from "lucide-react";
+import { EntityPickerModal } from "./EntityPickerModal";
 import { AppShell, Footer, PageHeader } from "./Layout";
 import { TopBar } from "./TopBar";
 import { UserMenu } from "./UserMenu";
@@ -9,6 +10,54 @@ const capacities = [
   { value: "director", label: "Director", detail: "Instituto de Física", icon: Building2 },
   { value: "professor", label: "Profesor", icon: Briefcase },
 ];
+
+describe("EntityPickerModal", () => {
+  it("renders the filters, summary, errors and actions without fetching data", async () => {
+    const onChoose = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <EntityPickerModal
+        isOpen
+        onClose={onClose}
+        title="Elegir espacio"
+        description="Elige un espacio disponible."
+        filters={<label>Filtro <input /></label>}
+        selectedSummary={<p>Espacio elegido</p>}
+        hasError
+        errorMessage="No fue posible cargar los espacios."
+        selectedEntityId="room-1"
+        chooseLabel="Elegir"
+        onChoose={onChoose}
+      >
+        <p>Laboratorio 104</p>
+      </EntityPickerModal>,
+    );
+    const dialog = screen.getByRole("dialog", { name: "Elegir espacio" });
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("No fue posible cargar los espacios.");
+    expect(within(dialog).getByText("Laboratorio 104")).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Cerrar" })).not.toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole("button", { name: "Elegir" }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Cancelar" }));
+    expect(onChoose).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("renders nothing while closed and hides choose until an entity is selected", () => {
+    const { rerender } = render(
+      <EntityPickerModal isOpen={false} onClose={vi.fn()} title="Elegir" chooseLabel="Elegir" onChoose={vi.fn()}>
+        <p>Contenido</p>
+      </EntityPickerModal>,
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    rerender(
+      <EntityPickerModal isOpen onClose={vi.fn()} title="Elegir" chooseLabel="Elegir" onChoose={vi.fn()}>
+        <p>Contenido</p>
+      </EntityPickerModal>,
+    );
+    expect(screen.getByRole("dialog", { name: "Elegir" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Elegir" })).not.toBeInTheDocument();
+  });
+});
 
 describe("UserMenu", () => {
   it("marks the active capacity and changes it", async () => {

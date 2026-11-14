@@ -1,12 +1,41 @@
 export { tones, type Tone, type ToneStyles } from "./theme/tones";
 export { Avatar, type AvatarProps } from "./components/atoms/Avatar";
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from "./components/atoms/Button";
+export {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  type CardProps,
+  type CardTitleProps,
+} from "./components/atoms/Card";
 export { Checkbox, type CheckboxProps } from "./components/atoms/Checkbox";
 export { Chip, type ChipProps } from "./components/atoms/Chip";
 export { CodePill, type CodePillProps } from "./components/atoms/CodePill";
+export { CountryFlag, type CountryFlagProps } from "./components/atoms/CountryFlag";
 export { Input, type FieldState, type InputProps, type InputSize } from "./components/atoms/Input";
 export { Label, type LabelProps } from "./components/atoms/Label";
 export { PingDot, type PingDotProps } from "./components/atoms/PingDot";
+export {
+  Select as NativeSelect,
+  type SelectOption as NativeSelectOption,
+  type SelectProps as NativeSelectProps,
+  type SelectSize as NativeSelectSize,
+  type SelectState as NativeSelectState,
+} from "./components/atoms/Select";
+export {
+  SearchableMultiSelect,
+  type SearchableMultiSelectOption,
+  type SearchableMultiSelectProps,
+} from "./components/atoms/SearchableMultiSelect";
+export {
+  SearchableSelect,
+  type SearchableSelectOption,
+  type SearchableSelectProps,
+  type SearchableSelectSize,
+  type SearchableSelectState,
+  type SearchableSelectVariant,
+} from "./components/atoms/SearchableSelect";
 export {
   SegmentedToggle,
   type SegmentedOption,
@@ -17,11 +46,26 @@ export { StatusBadge, type StatusBadgeProps } from "./components/atoms/StatusBad
 export { Textarea, type TextareaProps } from "./components/atoms/Textarea";
 export { Tooltip, type TooltipPosition, type TooltipProps } from "./components/atoms/Tooltip";
 export { EmptyState, type EmptyStateProps } from "./components/molecules/EmptyState";
+export { CollapsiblePanel, type CollapsiblePanelProps } from "./components/molecules/CollapsiblePanel";
+export { Dropdown, type DropdownOption, type DropdownProps } from "./components/molecules/Dropdown";
+export {
+  DropdownAcademicUnit,
+  type AcademicUnitOption,
+  type DropdownAcademicUnitProps,
+} from "./components/molecules/DropdownAcademicUnit";
 export { FormField, type FieldControlProps, type FormFieldProps } from "./components/molecules/FormField";
 export { Modal, type ModalAction, type ModalIntent, type ModalProps, type ModalSize } from "./components/molecules/Modal";
+export {
+  MultiSelectChips,
+  type MultiSelectChipsOption,
+  type MultiSelectChipsProps,
+} from "./components/molecules/MultiSelectChips";
 export { Pagination, type PaginationProps } from "./components/molecules/Pagination";
+export { PhoneInput, type PhoneInputProps } from "./components/molecules/PhoneInput";
 export { Select, type SelectOptionItem, type SelectProps } from "./components/molecules/Select";
+export { SelectionSummaryCard, type SelectionSummaryCardProps } from "./components/molecules/SelectionSummaryCard";
 export { SummaryCard, type SummaryCardProps } from "./components/molecules/SummaryCard";
+export { TableSkeleton, type TableSkeletonProps } from "./components/molecules/TableSkeleton";
 export { Toast, type ToastProps, type ToastTone } from "./components/molecules/Toast";
 export { Toaster, type ToasterProps } from "./components/molecules/Toaster";
 export { toast, type ToastOptions } from "./components/molecules/toastStore";
@@ -48,7 +92,22 @@ export {
   type UserMenuOption,
   type UserMenuProps,
 } from "./components/organisms/UserMenu";
+export { EntityPickerModal, type EntityPickerModalProps } from "./components/organisms/EntityPickerModal";
 export { useCountUp } from "./hooks/useCountUp";
+export {
+  DEFAULT_COUNTRY,
+  countryName,
+  countryOptions,
+  formatPhone,
+  groupDigits,
+  joinPhone,
+  maxNationalDigits,
+  onlyDigits,
+  phoneError,
+  splitPhone,
+  type CountryOption,
+  type SplitPhone,
+} from "./utils/phone";
 export {
   RecordCard,
   type RecordCardProps,
@@ -65,6 +124,7 @@ export {
   type TableProps,
   type TableRowProps,
 } from "./components/table/Table";
+export { DataTable, type DataTableColumn, type DataTableProps } from "./components/table/DataTable";
 export {
   TablePerson,
   TableText,

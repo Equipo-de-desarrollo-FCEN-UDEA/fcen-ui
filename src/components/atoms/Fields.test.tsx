@@ -3,7 +3,138 @@ import userEvent from "@testing-library/user-event";
 import { Search } from "lucide-react";
 import { Checkbox } from "./Checkbox";
 import { Input } from "./Input";
+import { SearchableMultiSelect } from "./SearchableMultiSelect";
+import { SearchableSelect } from "./SearchableSelect";
+import { Select as NativeSelect } from "./Select";
 import { Textarea } from "./Textarea";
+
+const choices = [
+  { value: "physics", label: "Instituto de Física" },
+  { value: "math", label: "Instituto de Matemáticas" },
+  { value: "biology", label: "Instituto de Biología" },
+];
+
+describe("NativeSelect", () => {
+  it("associates labels and helper text and supports uncontrolled clearing", async () => {
+    const user = userEvent.setup();
+    const onClear = vi.fn();
+    render(
+      <>
+        <NativeSelect
+          label="País"
+          options={[{ value: "CO", label: "Colombia" }, { value: "PE", label: "Perú" }]}
+          defaultValue="CO"
+          state="error"
+          helperText="Selecciona un país válido."
+          aria-describedby="country-hint"
+          onClear={onClear}
+        />
+        <p id="country-hint">Información adicional</p>
+      </>,
+    );
+    const select = screen.getByRole("combobox", { name: "País" });
+    expect(select).toHaveAttribute("aria-invalid", "true");
+    expect(select.getAttribute("aria-describedby")).toContain("country-hint");
+    const helperText = screen.getByText("Selecciona un país válido.");
+    expect(select.getAttribute("aria-describedby")?.split(" ")).toContain(helperText.id);
+    await user.click(screen.getByRole("button", { name: "Limpiar selección" }));
+    expect(select).toHaveValue("");
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+});
+
+describe("SearchableSelect", () => {
+  it("filters accent-insensitively and selects with the keyboard", async () => {
+    const onChange = vi.fn();
+    render(<SearchableSelect label="Unidad" options={choices} value="" onChange={onChange} />);
+    const input = screen.getByRole("combobox", { name: "Unidad" });
+    await userEvent.click(input);
+    await userEvent.type(input, "matematicas");
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    await userEvent.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith("math");
+    expect(input).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("reports no matches, closes on Escape or an outside click, and supports disabled", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <SearchableSelect options={choices} value="" onChange={vi.fn()} placeholder="Buscar unidad" />
+        <button type="button">Fuera</button>
+      </>,
+    );
+    const input = screen.getByRole("combobox", { name: "Buscar unidad" });
+    await user.click(input);
+    await user.type(input, "inexistente");
+    expect(screen.getByText("Sin resultados")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(input).toHaveAttribute("aria-expanded", "false");
+    await user.click(input);
+    await user.click(screen.getByRole("button", { name: "Fuera" }));
+    expect(input).toHaveAttribute("aria-expanded", "false");
+
+    const { rerender } = render(<SearchableSelect options={choices} value="" onChange={vi.fn()} disabled />);
+    expect(screen.getAllByRole("combobox")[1]).toBeDisabled();
+    rerender(<SearchableSelect options={choices} value="physics" onChange={vi.fn()} />);
+  });
+
+  it("retains the loan app's outline, size, and validation options", async () => {
+    const user = userEvent.setup();
+    render(
+      <SearchableSelect
+        label="Unidad"
+        options={choices}
+        value=""
+        onChange={vi.fn()}
+        variant="outline"
+        size="lg"
+        state="error"
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Unidad" }));
+    expect(screen.getByRole("combobox", { name: "Unidad" })).toHaveAttribute("aria-invalid", "true");
+  });
+});
+
+describe("SearchableMultiSelect", () => {
+  it("adds options by keyboard, removes chips, and removes the last item with Backspace", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <SearchableMultiSelect label="Unidades" options={choices} values={["physics"]} onChange={onChange} />,
+    );
+    const input = screen.getByRole("combobox", { name: "Unidades" });
+    await user.click(input);
+    await user.type(input, "instituto de matematicas");
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith(["physics", "math"]);
+
+    await user.click(screen.getByRole("button", { name: "Eliminar Instituto de Física" }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+    rerender(<SearchableMultiSelect options={choices} values={["physics"]} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox"));
+    await user.keyboard("{Backspace}");
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it("shows an empty result message and closes when clicking outside", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <SearchableMultiSelect options={choices} values={[]} onChange={vi.fn()} helperText="Elige unidades" />
+        <button type="button">Fuera</button>
+      </>,
+    );
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    await user.type(input, "ninguna");
+    expect(screen.getByText("Sin resultados")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Fuera" }));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByText("Elige unidades")).toBeInTheDocument();
+  });
+});
 
 describe("Input", () => {
   it("accepts typing", async () => {
