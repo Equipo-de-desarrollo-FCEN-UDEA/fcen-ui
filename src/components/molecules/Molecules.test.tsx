@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FolderOpen, Stamp } from "lucide-react";
 import { Input } from "../atoms/Input";
@@ -391,6 +391,24 @@ describe("Pagination", () => {
 
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(onPageChange).not.toHaveBeenCalled();
+  });
+
+  it("adapts to the width of its card instead of the screen", () => {
+    render(<Pagination page={2} pageSize={10} total={24} onPageChange={vi.fn()} onPageSizeChange={vi.fn()} />);
+
+    expect(screen.getByRole("navigation", { name: "Paginación" })).toHaveClass("@container", "w-full");
+    expect(screen.getByText("Mostrando 11–20 de 24")).toHaveClass("whitespace-nowrap");
+    expect(screen.getByText("de 3")).toHaveClass("whitespace-nowrap");
+  });
+
+  it("leaves only the arrows on narrow cards and keeps the button names", () => {
+    render(<Pagination page={2} pageSize={10} total={24} onPageChange={vi.fn()} />);
+
+    for (const name of ["Anterior", "Siguiente"]) {
+      const button = screen.getByRole("button", { name });
+      expect(button).toHaveClass("@max-md:[&_.truncate]:sr-only");
+      expect(within(button).getByText(name)).toHaveClass("truncate");
+    }
   });
 
   it("opens upwards when there is room above the pagination", async () => {

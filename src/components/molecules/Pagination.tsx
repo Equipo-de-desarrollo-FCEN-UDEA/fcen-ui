@@ -21,6 +21,7 @@ type CompactMenuProps = {
   tone: "neutral" | "brand";
 };
 
+const ARROW_ONLY_WHEN_NARROW = "@max-md:[&_.truncate]:sr-only";
 const VISIBLE_OPTIONS = 5;
 const OPTION_HEIGHT = 32;
 const MENU_PADDING = 6;
@@ -173,41 +174,45 @@ export const Pagination = ({
   const next = () => onPageChange(page + 1);
 
   return (
-    <nav aria-label="Paginación" className={clsx("flex flex-col items-center justify-between gap-4 sm:flex-row", className)}>
-      <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-        <span>
-          Mostrando {formatCount(first)}–{formatCount(last)} de {formatCount(total)}
-        </span>
-        {onPageSizeChange && (
-          <>
-            <span aria-hidden className="text-gray-400">
-              •
+    <nav aria-label="Paginación" className={clsx("@container w-full", className)}>
+      <div className="flex flex-col items-center gap-3 @3xl:flex-row @3xl:justify-between @3xl:gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+          <span className="whitespace-nowrap">
+            Mostrando {formatCount(first)}–{formatCount(last)} de {formatCount(total)}
+          </span>
+          {onPageSizeChange && (
+            <span className="flex items-center gap-3 whitespace-nowrap">
+              <span aria-hidden className="text-gray-400 @max-md:hidden">
+                •
+              </span>
+              <span>Por página</span>
+              <CompactMenu label="Por página" value={pageSize} options={pageSizeOptions} onChange={changeSize} tone="neutral" />
             </span>
-            <span>Por página</span>
-            <CompactMenu label="Por página" value={pageSize} options={pageSizeOptions} onChange={changeSize} tone="neutral" />
-          </>
-        )}
-      </div>
-      <div className="flex items-center gap-3 text-sm text-brand-800 dark:text-gray-300">
-        <span>Página</span>
-        <CompactMenu label="Página" value={page} options={pages} onChange={onPageChange} tone="brand" />
-        <span>de {formatCount(totalPages)}</span>
-        <Button
-          label="Anterior"
-          variant="secondary"
-          size="sm"
-          onClick={previous}
-          disabled={page <= 1}
-          iconLeft={<ChevronLeft size={16} aria-hidden />}
-        />
-        <Button
-          label="Siguiente"
-          variant="secondary"
-          size="sm"
-          onClick={next}
-          disabled={page >= totalPages}
-          iconRight={<ChevronRight size={16} aria-hidden />}
-        />
+          )}
+        </div>
+        <div className="flex items-center gap-2 text-sm text-brand-800 @md:gap-3 dark:text-gray-300">
+          <span>Página</span>
+          <CompactMenu label="Página" value={page} options={pages} onChange={onPageChange} tone="brand" />
+          <span className="whitespace-nowrap">de {formatCount(totalPages)}</span>
+          <Button
+            label="Anterior"
+            variant="secondary"
+            size="sm"
+            onClick={previous}
+            disabled={page <= 1}
+            iconLeft={<ChevronLeft size={16} aria-hidden />}
+            className={ARROW_ONLY_WHEN_NARROW}
+          />
+          <Button
+            label="Siguiente"
+            variant="secondary"
+            size="sm"
+            onClick={next}
+            disabled={page >= totalPages}
+            iconRight={<ChevronRight size={16} aria-hidden />}
+            className={ARROW_ONLY_WHEN_NARROW}
+          />
+        </div>
       </div>
     </nav>
   );
