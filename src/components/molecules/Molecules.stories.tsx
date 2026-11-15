@@ -283,6 +283,33 @@ export const PaginationWithManyPages: Story = {
   render: () => <ManyPagesDemo />,
 };
 
+function CardPaginationDemo({ width }: Readonly<{ width: number }>) {
+  const [page, setPage] = useState(120);
+  const [pageSize, setPageSize] = useState(10);
+  return (
+    <div className="pt-52">
+      <div
+        style={{ width }}
+        className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900"
+      >
+        <Pagination page={page} pageSize={pageSize} total={3667} onPageChange={setPage} onPageSizeChange={setPageSize} />
+      </div>
+    </div>
+  );
+}
+
+export const PaginationInAPhoneCard: Story = {
+  render: () => <CardPaginationDemo width={343} />,
+};
+
+export const PaginationInATabletCard: Story = {
+  render: () => <CardPaginationDemo width={640} />,
+};
+
+export const PaginationInAWideCard: Story = {
+  render: () => <CardPaginationDemo width={960} />,
+};
+
 function CollapsiblePanelDemo() {
   const [collapsed, setCollapsed] = useState(false);
   return (
