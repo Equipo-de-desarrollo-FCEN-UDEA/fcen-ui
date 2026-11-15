@@ -89,6 +89,7 @@ npm run build
 `main` is the only branch.
 
 1. Raise `version` in `package.json` together with the change.
-2. Create a GitHub release whose tag is `v<version>` on the head of `main`.
-3. The `Release` workflow checks the tag and waits in the `npm` environment, which only accepts `v*` tags, until one of its reviewers approves it on GitHub.
-4. Once approved, it runs the checks and publishes the version on npm through trusted publishing, with provenance.
+2. When the pull request is merged, the `Release` workflow checks whether that version is already on npm. If it is not, it waits in the `npm` environment, which only accepts `main`, until one of its reviewers approves it on GitHub.
+3. Once approved, it runs the checks, publishes the version on npm through trusted publishing, with provenance, and creates the GitHub release `v<version>`.
+
+A merge that does not raise `version` publishes nothing.
