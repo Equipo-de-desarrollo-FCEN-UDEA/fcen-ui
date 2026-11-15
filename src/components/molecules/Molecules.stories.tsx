@@ -1,14 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { Check, RefreshCw, Stamp, Undo2, UserRoundCog, X } from "lucide-react";
+import { CalendarDays, Check, FlaskConical, RefreshCw, Stamp, Undo2, UserRoundCog, X } from "lucide-react";
 import { Button } from "../atoms/Button";
 import { Input } from "../atoms/Input";
 import { Textarea } from "../atoms/Textarea";
+import { EntityPickerModal } from "../organisms/EntityPickerModal";
+import { CollapsiblePanel } from "./CollapsiblePanel";
+import { Dropdown } from "./Dropdown";
+import { DropdownAcademicUnit } from "./DropdownAcademicUnit";
 import { EmptyState } from "./EmptyState";
 import { FormField } from "./FormField";
 import { Modal, type ModalIntent } from "./Modal";
+import { MultiSelectChips } from "./MultiSelectChips";
 import { Pagination } from "./Pagination";
 import { Select, type SelectOptionItem } from "./Select";
+import { SelectionSummaryCard } from "./SelectionSummaryCard";
 import { SummaryCard } from "./SummaryCard";
 import { Toast } from "./Toast";
 import { Toaster } from "./Toaster";
@@ -117,13 +123,23 @@ const intents: { intent: ModalIntent; title: string; description: string; action
 
 function ModalDemo() {
   const [openIntent, setOpenIntent] = useState<ModalIntent | null>(null);
+  const [entityPickerOpen, setEntityPickerOpen] = useState(false);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const [entityType, setEntityType] = useState("all");
   const current = intents.find((item) => item.intent === openIntent);
   const close = () => setOpenIntent(null);
+  const entities = [
+    { id: "lab-104", type: "laboratory", label: "Laboratorio 104", detail: "Bloque 6 · 24 puestos", icon: FlaskConical },
+    { id: "classroom-301", type: "classroom", label: "Aula 301", detail: "Bloque 3 · 36 puestos", icon: CalendarDays },
+  ];
+  const visibleEntities = entities.filter((entity) => entityType === "all" || entity.type === entityType);
+  const selectedEntity = entities.find((entity) => entity.id === selectedEntityId);
   return (
     <div className="flex gap-3">
       {intents.map((item) => (
         <Button key={item.intent} label={item.title} variant="outline" onClick={() => setOpenIntent(item.intent)} />
       ))}
+      <Button label="Seleccionar espacio" variant="outline" onClick={() => setEntityPickerOpen(true)} />
       {current && (
         <Modal
           isOpen
@@ -145,6 +161,49 @@ function ModalDemo() {
           {current.intent === "warning" && <Textarea aria-label="Observación" placeholder="Escribir observación…" />}
         </Modal>
       )}
+      <EntityPickerModal
+        isOpen={entityPickerOpen}
+        onClose={() => setEntityPickerOpen(false)}
+        title="Seleccionar espacio"
+        description="Busca y elige el espacio que necesitas."
+        filters={
+          <Select
+            options={[
+              { value: "all", label: "Todos los espacios" },
+              { value: "laboratory", label: "Laboratorios" },
+              { value: "classroom", label: "Aulas" },
+            ]}
+            value={entityType}
+            onChange={setEntityType}
+            searchable
+            aria-label="Filtrar espacios"
+          />
+        }
+        selectedSummary={
+          <SelectionSummaryCard label="Espacio seleccionado:">
+            {selectedEntity?.label ?? "Ninguno"}
+          </SelectionSummaryCard>
+        }
+        selectedEntityId={selectedEntityId}
+        chooseLabel="Elegir espacio"
+        onChoose={() => setEntityPickerOpen(false)}
+      >
+        <div className="divide-y divide-gray-100 dark:divide-slate-800">
+          {visibleEntities.map(({ id, label, detail, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={selectedEntityId === id}
+              onClick={() => setSelectedEntityId(id)}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:text-gray-200 dark:hover:bg-slate-800"
+            >
+              <Icon size={16} aria-hidden />
+              <span className="flex-1">{label}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{detail}</span>
+            </button>
+          ))}
+        </div>
+      </EntityPickerModal>
     </div>
   );
 }
@@ -222,6 +281,91 @@ function ManyPagesDemo() {
 
 export const PaginationWithManyPages: Story = {
   render: () => <ManyPagesDemo />,
+};
+
+function CollapsiblePanelDemo() {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <CollapsiblePanel
+      index={1}
+      title="Reserva de laboratorio"
+      subtitle="Información del espacio"
+      collapsed={collapsed}
+      onToggle={() => setCollapsed((value) => !value)}
+      error="Revisa el horario seleccionado."
+      actions={<Button label="Editar" variant="outline" size="sm" />}
+    >
+      <p className="text-sm text-gray-700 dark:text-gray-200">Laboratorio de Física · Bloque 6</p>
+    </CollapsiblePanel>
+  );
+}
+
+export const CollapsiblePanels: Story = {
+  render: () => <CollapsiblePanelDemo />,
+};
+
+function DropdownDemo() {
+  const [room, setRoom] = useState("Seleccionar espacio");
+  const [unit, setUnit] = useState("fisica");
+  return (
+    <div className="grid max-w-3xl grid-cols-2 gap-6">
+      <Dropdown
+        title={room}
+        options={[
+          { value: "block-6", label: "Bloque 6", children: [
+            { value: "lab-104", label: "Laboratorio 104" },
+            { value: "lab-105", label: "Laboratorio 105" },
+          ] },
+          { value: "block-3", label: "Bloque 3" },
+        ]}
+        onSelect={(_value, option) => setRoom(option?.label ?? "Seleccionar espacio")}
+      />
+      <DropdownAcademicUnit
+        units={[
+          { id: "facultad", name: "Facultad", children: [
+            { id: "fisica", name: "Instituto de Física" },
+            { id: "matematicas", name: "Instituto de Matemáticas" },
+          ] },
+        ]}
+        value={unit}
+        onSelect={setUnit}
+      />
+    </div>
+  );
+}
+
+export const Dropdowns: Story = {
+  render: () => <DropdownDemo />,
+};
+
+function MultiSelectChipsDemo() {
+  const [selected, setSelected] = useState(["fisica"]);
+  return (
+    <div className="max-w-md">
+      <MultiSelectChips
+        label="Unidades académicas"
+        options={[
+          { value: "fisica", label: "Instituto de Física" },
+          { value: "matematicas", label: "Instituto de Matemáticas" },
+          { value: "biologia", label: "Instituto de Biología" },
+        ]}
+        selected={selected}
+        onChange={setSelected}
+      />
+    </div>
+  );
+}
+
+export const MultiSelects: Story = {
+  render: () => <MultiSelectChipsDemo />,
+};
+
+export const SelectionSummaries: Story = {
+  render: () => (
+    <SelectionSummaryCard label="Espacio seleccionado:">
+      Laboratorio de Física
+    </SelectionSummaryCard>
+  ),
 };
 
 export const SummaryCards: Story = {

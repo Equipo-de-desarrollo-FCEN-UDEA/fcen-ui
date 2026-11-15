@@ -30,7 +30,15 @@ export default defineConfig({
     },
     sourcemap: true,
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime", "clsx", "lucide-react"],
+      external: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "clsx",
+        "lucide-react",
+        "libphonenumber-js/min",
+        "libphonenumber-js/min/metadata",
+      ],
       output: {
         preserveModules: true,
         preserveModulesRoot: "src",

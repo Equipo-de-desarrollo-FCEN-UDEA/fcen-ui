@@ -1,8 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { CountryCode } from "libphonenumber-js/min";
 import { Avatar } from "./Avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "./Card";
 import { Chip } from "./Chip";
 import { CodePill } from "./CodePill";
+import { CountryFlag } from "./CountryFlag";
 import { Label } from "./Label";
 import { PingDot } from "./PingDot";
 import { Spinner } from "./Spinner";
@@ -10,6 +13,31 @@ import { StatusBadge } from "./StatusBadge";
 import type { Tone } from "../../theme/tones";
 
 const allTones: Tone[] = ["info", "review", "warning", "success", "danger", "neutral"];
+
+describe("Card", () => {
+  it("renders its content and forwards HTML attributes", () => {
+    render(
+      <Card data-testid="card">
+        <CardHeader><CardTitle>Espacios</CardTitle></CardHeader>
+        <CardContent>Laboratorios disponibles</CardContent>
+      </Card>,
+    );
+    expect(screen.getByTestId("card")).toHaveTextContent("EspaciosLaboratorios disponibles");
+  });
+});
+
+describe("CountryFlag", () => {
+  it("renders a bundled flag with the localized country name", () => {
+    render(<CountryFlag country="CO" />);
+    expect(screen.getByTitle("Colombia").getAttribute("src")).toContain("data:image/svg+xml");
+  });
+
+  it("renders nothing for an unsupported code", () => {
+    const unsupported = "ZZ" as CountryCode;
+    const { container } = render(<CountryFlag country={unsupported} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+});
 
 describe("StatusBadge", () => {
   it.each(allTones)("renders the %s tone", (tone) => {

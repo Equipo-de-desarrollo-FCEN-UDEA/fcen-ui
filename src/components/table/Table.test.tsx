@@ -1,7 +1,47 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { DataTable, type DataTableColumn } from "./DataTable";
 import { Table, TableRow } from "./Table";
 import { TablePerson, TableText, TableTitle } from "./TableCells";
+
+type TestRow = { name: string; count: number };
+const dataTableColumns: DataTableColumn<TestRow>[] = [
+  { key: "name", header: "Nombre", sortable: true },
+  { key: "count", header: "Cantidad", align: "right", render: (row) => `${row.count} unidades` },
+];
+
+describe("DataTable", () => {
+  it("renders columns and rows, sorts, and renders row actions", async () => {
+    const onSort = vi.fn();
+    render(
+      <DataTable
+        title="Unidades"
+        subtitle="Catálogo"
+        columns={dataTableColumns}
+        data={[{ name: "Física", count: 3 }]}
+        sortBy="name"
+        sortDir="asc"
+        onSort={onSort}
+        rowKey={(row) => row.name}
+        rowActions={(row) => <button type="button">Abrir {row.name}</button>}
+      />,
+    );
+    expect(screen.getByRole("table", { name: "Unidades" })).toBeInTheDocument();
+    expect(screen.getByText("3 unidades")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /Nombre/ })).toHaveAttribute("aria-sort", "ascending");
+    await userEvent.click(screen.getByRole("button", { name: /Nombre/ }));
+    expect(onSort).toHaveBeenCalledWith("name");
+    expect(screen.getByRole("button", { name: "Abrir Física" })).toBeInTheDocument();
+  });
+
+  it("renders empty and loading states", () => {
+    const { rerender, container } = render(<DataTable columns={dataTableColumns} data={[]} emptyMessage="Sin unidades" />);
+    expect(screen.getByText("Sin unidades")).toBeInTheDocument();
+    rerender(<DataTable columns={dataTableColumns} data={[]} loading />);
+    expect(container.querySelector("tbody")).toHaveAttribute("aria-busy", "true");
+    expect(document.querySelectorAll("tbody .animate-pulse")).toHaveLength(10);
+  });
+});
 
 describe("Table", () => {
   it("sets the column widths once for the header and the rows", () => {

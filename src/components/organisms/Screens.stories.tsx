@@ -27,7 +27,7 @@ import { Timeline, TimelineItem } from "../process/TimelineItem";
 import { HeroNavTile } from "../tiles/HeroNavTile";
 import { NavTile } from "../tiles/NavTile";
 import { StatusTile } from "../tiles/StatusTile";
-import { AppShell, PageHeader } from "./Layout";
+import { AppShell, Footer, PageHeader } from "./Layout";
 import { TopBar, type ThemeMode } from "./TopBar";
 import { UserMenu } from "./UserMenu";
 
@@ -242,6 +242,14 @@ export const WizardSteps: Story = {
           { label: "Finalizada", state: "upcoming" },
         ]}
       />
+    </div>
+  ),
+};
+
+export const FooterExample: Story = {
+  render: () => (
+    <div className="w-full">
+      <Footer text="Equipo de desarrollo de la Facultad de Ciencias Exactas y Naturales" year={2026} />
     </div>
   ),
 };

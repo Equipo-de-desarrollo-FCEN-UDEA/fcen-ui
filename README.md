@@ -63,12 +63,13 @@ Dark mode follows the `dark` class on `<html>`.
 
 | Group | Components |
 | --- | --- |
-| Atoms | Button, StatusBadge, PingDot, Avatar, CodePill, Chip, Label, Spinner, Tooltip, Input, Textarea, Checkbox, SegmentedToggle, AnimatedCount |
-| Molecules | FormField, Select, Modal, Toast, Toaster and `toast`, EmptyState, Pagination, SummaryCard |
+| Atoms | Button, StatusBadge, PingDot, Avatar, CodePill, Chip, Label, Spinner, Tooltip, Input, Textarea, Checkbox, SegmentedToggle, AnimatedCount, Card, CountryFlag, SearchableSelect, SearchableMultiSelect |
+| Molecules | FormField, Select, Modal, Toast, Toaster and `toast`, EmptyState, Pagination, SummaryCard, CollapsiblePanel, Dropdown, DropdownAcademicUnit, MultiSelectChips, PhoneInput, SelectionSummaryCard, TableSkeleton |
 | Tiles | NavTile, HeroNavTile, StatusTile |
 | Process | Stepper, Timeline, TimelineItem, FileDrop, FileItem |
 | Records | RecordCard, RecordRow |
-| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell |
+| Tables | Table, DataTable and table cell components |
+| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell, EntityPickerModal |
 
 Every component has its stories in Storybook, matching the Figma file of SIGA v4, with a light and dark toggle. The test suite also renders every story and checks it with axe.
 

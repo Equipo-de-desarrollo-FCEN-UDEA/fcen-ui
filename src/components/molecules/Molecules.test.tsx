@@ -1,11 +1,235 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FolderOpen, Stamp } from "lucide-react";
 import { Input } from "../atoms/Input";
+import { CollapsiblePanel } from "./CollapsiblePanel";
+import { Dropdown } from "./Dropdown";
+import { DropdownAcademicUnit } from "./DropdownAcademicUnit";
 import { EmptyState } from "./EmptyState";
 import { FormField } from "./FormField";
+import { MultiSelectChips } from "./MultiSelectChips";
 import { Pagination } from "./Pagination";
+import { PhoneInput } from "./PhoneInput";
+import { SelectionSummaryCard } from "./SelectionSummaryCard";
 import { SummaryCard } from "./SummaryCard";
+import { TableSkeleton } from "./TableSkeleton";
+import { countryName, countryOptions, formatPhone, joinPhone, phoneError, splitPhone } from "../../utils/phone";
+
+const choices = [
+  { value: "physics", label: "Instituto de Física" },
+  { value: "math", label: "Instituto de Matemáticas" },
+  { value: "biology", label: "Instituto de Biología" },
+];
+
+describe("CollapsiblePanel", () => {
+  it("toggles the body and displays the error and action", async () => {
+    const onToggle = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <CollapsiblePanel
+        index={2}
+        title="Reserva"
+        subtitle="Espacio"
+        collapsed={false}
+        onToggle={onToggle}
+        error="Horario requerido"
+        actions={<button type="button">Editar</button>}
+      >
+        <p>Detalle de reserva</p>
+      </CollapsiblePanel>,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Horario requerido");
+    await user.click(screen.getByRole("button", { name: "Minimizar" }));
+    expect(onToggle).toHaveBeenCalledOnce();
+    rerender(
+      <CollapsiblePanel index={2} title="Reserva" subtitle="Espacio" collapsed onToggle={onToggle}>
+        <p>Detalle de reserva</p>
+      </CollapsiblePanel>,
+    );
+    expect(screen.queryByText("Detalle de reserva")).not.toBeInTheDocument();
+  });
+
+  it("keeps the body visible when the toggle is hidden", () => {
+    render(
+      <CollapsiblePanel index={1} title="Aula" subtitle="Bloque 1" collapsed onToggle={vi.fn()} hideToggle>
+        <p>Contenido fijo</p>
+      </CollapsiblePanel>,
+    );
+    expect(screen.getByText("Contenido fijo")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Expandir" })).not.toBeInTheDocument();
+  });
+});
+
+describe("Dropdown", () => {
+  it("expands nested options and returns the selected option", async () => {
+    const onSelect = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Dropdown
+        title="Seleccionar"
+        options={[{ value: "faculty", label: "Facultad", children: [{ value: "physics", label: "Física" }] }]}
+        onSelect={onSelect}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Seleccionar" }));
+    await user.click(screen.getByRole("button", { name: "Ver subunidades de Facultad" }));
+    await user.click(screen.getByRole("menuitem", { name: "Física" }));
+    expect(onSelect).toHaveBeenCalledWith("physics", { value: "physics", label: "Física" });
+    expect(screen.getByRole("button", { name: "Seleccionar" })).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("shows empty options", async () => {
+    const user = userEvent.setup();
+    render(<Dropdown title="Vacío" options={[]} onSelect={vi.fn()} />);
+    await user.click(screen.getByRole("button", { name: "Vacío" }));
+    expect(screen.getByText("Sin datos disponibles")).toBeInTheDocument();
+  });
+
+  it("triggers lazy expansion, shows loading and closes outside", async () => {
+    const onExpand = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <>
+        <Dropdown
+          title="Unidades"
+          options={[{ value: "root", label: "Raíz", expandable: true }]}
+          onSelect={vi.fn()}
+          onExpand={onExpand}
+          loadingId="root"
+        />
+        <button type="button">Fuera</button>
+      </>,
+    );
+    await user.click(screen.getByRole("button", { name: "Unidades" }));
+    await user.click(screen.getByRole("button", { name: "Ver subunidades de Raíz" }));
+    expect(onExpand).toHaveBeenCalledWith("root");
+    expect(document.querySelector(".animate-spin")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Fuera" }));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("does not open when disabled", async () => {
+    render(<Dropdown title="Bloqueado" options={[]} onSelect={vi.fn()} disabled />);
+    const trigger = screen.getByRole("button", { name: "Bloqueado" });
+    expect(trigger).toBeDisabled();
+    await userEvent.click(trigger);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+});
+
+describe("DropdownAcademicUnit", () => {
+  const units = [{ id: "faculty", name: "Facultad", children: [{ id: "physics", name: "Física" }] }];
+
+  it("receives its options and reports both selected ID and label", async () => {
+    const onSelect = vi.fn();
+    const onSelectWithLabel = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <DropdownAcademicUnit
+        units={units}
+        value=""
+        onSelect={onSelect}
+        onSelectWithLabel={onSelectWithLabel}
+        placeholder="Unidad"
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Unidad" }));
+    await user.click(screen.getByRole("button", { name: "Ver subunidades de Facultad" }));
+    await user.click(screen.getByRole("menuitem", { name: "Física" }));
+    expect(onSelect).toHaveBeenCalledWith("physics");
+    expect(onSelectWithLabel).toHaveBeenCalledWith("physics", "Física");
+  });
+
+  it("uses the supplied selected label when there is no matching option", () => {
+    render(<DropdownAcademicUnit units={[]} value="missing" selectedLabel="Unidad seleccionada" onSelect={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Unidad seleccionada" })).toBeInTheDocument();
+  });
+
+  it("does not keep a cached selection label after the selection is cleared", async () => {
+    const user = userEvent.setup();
+    const options = [{ id: "physics", name: "Instituto de Física" }];
+    const props = { units: options, onSelect: vi.fn(), selectedLabel: "Seleccionar unidad" };
+    const { rerender } = render(<DropdownAcademicUnit {...props} value="physics" />);
+    await user.click(screen.getByRole("button", { name: "Instituto de Física" }));
+    await user.click(screen.getByRole("menuitem", { name: "Instituto de Física" }));
+    rerender(<DropdownAcademicUnit {...props} value="" />);
+    expect(screen.getByRole("button", { name: "Seleccionar unidad" })).toBeInTheDocument();
+  });
+});
+
+describe("MultiSelectChips", () => {
+  it("adds an available option and removes selected chips", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<MultiSelectChips label="Unidades" options={choices} selected={["physics"]} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox", { name: "Unidades" }));
+    await user.click(screen.getByRole("option", { name: "Instituto de Matemáticas" }));
+    expect(onChange).toHaveBeenCalledWith(["physics", "math"]);
+    await user.click(screen.getByRole("button", { name: "Quitar Instituto de Física" }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+});
+
+describe("PhoneInput and phone helpers", () => {
+  it("normalizes, formats and validates international phone numbers", () => {
+    const parsed = splitPhone("573052451024");
+    expect(parsed).toEqual({ country: "CO", national: "3052451024" });
+    expect(joinPhone(parsed)).toBe("573052451024");
+    expect(formatPhone("573052451024")).toBe("57 305 245 1024");
+    expect(phoneError(parsed)).toBeNull();
+    expect(phoneError({ country: "CO", national: "12" })).toMatch(/Colombia/);
+    expect(phoneError({ country: "CO", national: "" })).toBeNull();
+    expect(countryName("CO")).toBe("Colombia");
+    expect(countryOptions[0].country).toBe("CO");
+  });
+
+  it("updates the calling code and validates user-entered digits", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<PhoneInput label="Teléfono" defaultValue="573052451024" onChange={onChange} />);
+    const phone = screen.getByRole("textbox", { name: "Teléfono" });
+    expect(phone).toHaveValue("305 245 1024");
+    await user.clear(phone);
+    await user.type(phone, "5551234567");
+    expect(onChange).toHaveBeenLastCalledWith("575551234567");
+
+    const country = screen.getByRole("combobox", { name: "País" });
+    await user.click(country);
+    await user.type(country, "Estados Unidos");
+    await user.click(screen.getByRole("option", { name: /Estados Unidos/ }));
+    expect(onChange).toHaveBeenLastCalledWith("15551234567");
+  });
+
+  it("handles editing the grouping separator and disabled controls", async () => {
+    const onChange = vi.fn();
+    const { rerender } = render(<PhoneInput label="Contacto" onChange={onChange} />);
+    const phone = screen.getByRole("textbox", { name: "Contacto" });
+    fireEvent.change(phone, { target: { value: "305 245 1024", selectionStart: 5 } });
+    expect(onChange).toHaveBeenCalled();
+    rerender(<PhoneInput label="Contacto" onChange={onChange} disabled />);
+    expect(screen.getByRole("textbox", { name: "Contacto" })).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "País" })).toBeDisabled();
+  });
+});
+
+describe("SelectionSummaryCard", () => {
+  it("renders a summary with and without a label", () => {
+    const { rerender } = render(<SelectionSummaryCard label="Unidad:">Física</SelectionSummaryCard>);
+    expect(screen.getByText("Unidad:")).toBeInTheDocument();
+    expect(screen.getByText("Física")).toBeInTheDocument();
+    rerender(<SelectionSummaryCard>Matemáticas</SelectionSummaryCard>);
+    expect(screen.getByText("Matemáticas")).toBeInTheDocument();
+  });
+});
+
+describe("TableSkeleton", () => {
+  it("renders the requested dimensions and handles empty dimensions", () => {
+    const { rerender, container } = render(<TableSkeleton rows={2} columns={3} />);
+    expect(container.querySelectorAll(".animate-pulse")).toHaveLength(9);
+    rerender(<TableSkeleton rows={-1} columns={0} />);
+    expect(container.querySelectorAll(".animate-pulse")).toHaveLength(0);
+  });
+});
 
 describe("FormField", () => {
   it("links the label and the helper text to its control", () => {

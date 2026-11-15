@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Button } from "../atoms/Button";
 import { StatusBadge } from "../atoms/StatusBadge";
 import { DocumentCount } from "../records/DocumentCount";
 import type { Tone } from "../../theme/tones";
+import { TableSkeleton } from "../molecules/TableSkeleton";
+import { DataTable, type DataTableColumn } from "./DataTable";
 import { Table, TableRow, type TableColumn } from "./Table";
 import { TablePerson, TableText, TableTitle } from "./TableCells";
 
@@ -140,4 +143,41 @@ export const WithoutClick: Story = {
       ))}
     </Table>
   ),
+};
+
+type Room = { name: string; building: string; capacity: number };
+
+const roomColumns: DataTableColumn<Room>[] = [
+  { key: "name", header: "Espacio", sortable: true },
+  { key: "building", header: "Bloque" },
+  { key: "capacity", header: "Capacidad", align: "center" },
+];
+
+const rooms: Room[] = [
+  { name: "Laboratorio de Física", building: "6", capacity: 24 },
+  { name: "Aula 301", building: "3", capacity: 36 },
+];
+
+export const DataTables: Story = {
+  render: () => (
+    <DataTable
+      title="Espacios"
+      subtitle="Espacios disponibles para reserva"
+      columns={roomColumns}
+      data={rooms}
+      sortBy="name"
+      sortDir="asc"
+      onSort={() => undefined}
+      rowKey={(room) => room.name}
+      rowActions={(room) => <Button label={`Editar ${room.name}`} variant="outline" size="sm" />}
+    />
+  ),
+};
+
+export const DataTableLoading: Story = {
+  render: () => <DataTable title="Espacios" columns={roomColumns} data={[]} loading />,
+};
+
+export const TableSkeletons: Story = {
+  render: () => <TableSkeleton rows={3} columns={4} />,
 };

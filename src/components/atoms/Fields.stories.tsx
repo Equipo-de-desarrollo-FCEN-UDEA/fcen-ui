@@ -3,10 +3,13 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { Checkbox } from "./Checkbox";
 import { Input } from "./Input";
+import { SearchableMultiSelect } from "./SearchableMultiSelect";
+import { SearchableSelect } from "./SearchableSelect";
 import { SegmentedToggle } from "./SegmentedToggle";
 import { Textarea } from "./Textarea";
 import { Tooltip } from "./Tooltip";
 import { Button } from "./Button";
+import { PhoneInput } from "../molecules/PhoneInput";
 
 const meta = {
   title: "Atoms/Fields",
@@ -15,6 +18,12 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+const units = [
+  { value: "fisica", label: "Instituto de Física" },
+  { value: "matematicas", label: "Instituto de Matemáticas" },
+  { value: "biologia", label: "Instituto de Biología" },
+];
 
 export const Inputs: Story = {
   render: () => (
@@ -25,6 +34,49 @@ export const Inputs: Story = {
       <Input aria-label="Asunto deshabilitado" placeholder="Escribir…" disabled />
       <Input aria-label="Asunto pequeño" placeholder="Escribir…" size="sm" />
       <Input aria-label="Asunto con valor" defaultValue="Congreso de Física 2026" />
+    </div>
+  ),
+};
+
+function SearchableSelectDemo() {
+  const [unit, setUnit] = useState("fisica");
+  const [selectedUnits, setSelectedUnits] = useState(["matematicas"]);
+  return (
+    <div className="grid max-w-3xl grid-cols-2 gap-6">
+      <SearchableSelect
+        label="Unidad académica"
+        options={units}
+        value={unit}
+        onChange={setUnit}
+        variant="outline"
+      />
+      <SearchableSelect
+        label="Unidad con error"
+        options={units}
+        value=""
+        onChange={() => undefined}
+        state="error"
+        helperText="Selecciona una unidad."
+      />
+      <SearchableMultiSelect
+        label="Unidades académicas"
+        options={units}
+        values={selectedUnits}
+        onChange={setSelectedUnits}
+        helperText="Puedes elegir más de una."
+      />
+    </div>
+  );
+}
+
+export const SearchableSelects: Story = {
+  render: () => <SearchableSelectDemo />,
+};
+
+export const PhoneInputs: Story = {
+  render: () => (
+    <div className="max-w-xl">
+      <PhoneInput label="Teléfono de contacto" defaultValue="573052451024" onChange={() => undefined} />
     </div>
   ),
 };
