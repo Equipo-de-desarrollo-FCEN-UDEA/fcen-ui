@@ -104,7 +104,7 @@ export const PhoneInput = ({
       <div className="flex flex-col gap-2 sm:flex-row">
         <SearchableSelect
           className="w-full shrink-0 sm:w-32"
-          inputClassName="border-slate-200 dark:border-slate-700"
+          inputClassName="border-slate-200 placeholder:text-gray-700! dark:border-slate-700 dark:placeholder:text-gray-100!"
           options={options}
           value={country}
           placeholder={countryLabel}

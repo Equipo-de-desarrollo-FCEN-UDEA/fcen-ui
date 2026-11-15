@@ -63,7 +63,7 @@ Dark mode follows the `dark` class on `<html>`.
 
 | Group | Components |
 | --- | --- |
-| Atoms | Button, StatusBadge, PingDot, Avatar, CodePill, Chip, Label, Spinner, Tooltip, Input, NativeSelect, Textarea, Checkbox, SegmentedToggle, AnimatedCount, Card, CountryFlag, SearchableSelect, SearchableMultiSelect |
+| Atoms | Button, StatusBadge, PingDot, Avatar, CodePill, Chip, Label, Spinner, Tooltip, Input, Textarea, Checkbox, SegmentedToggle, AnimatedCount, Card, CountryFlag, SearchableSelect, SearchableMultiSelect |
 | Molecules | FormField, Select, Modal, Toast, Toaster and `toast`, EmptyState, Pagination, SummaryCard, CollapsiblePanel, Dropdown, DropdownAcademicUnit, MultiSelectChips, PhoneInput, SelectionSummaryCard, TableSkeleton |
 | Tiles | NavTile, HeroNavTile, StatusTile |
 | Process | Stepper, Timeline, TimelineItem, FileDrop, FileItem |

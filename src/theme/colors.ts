@@ -30,7 +30,7 @@ export const colors = {
     base: "rounded-xl border bg-white text-gray-700 outline-none transition-[border-color,box-shadow] placeholder:text-gray-400 dark:bg-slate-900 dark:text-gray-100 dark:placeholder:text-gray-500",
     idle: "border-gray-300 focus:border-brand-600 focus:shadow-focus dark:border-slate-700 dark:focus:border-brand-400",
     error: "border-red-600 focus:shadow-focus-danger dark:border-rose-500",
-    success: "border-emerald-600 focus:border-emerald-600 dark:border-emerald-500 dark:focus:border-emerald-400",
+    success: "border-emerald-600 focus:shadow-focus dark:border-emerald-500",
     disabled: "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-slate-800",
   },
 };

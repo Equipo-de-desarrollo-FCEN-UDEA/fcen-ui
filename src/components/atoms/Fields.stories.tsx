@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { Checkbox } from "./Checkbox";
 import { Input } from "./Input";
-import { Select as NativeSelect } from "./Select";
 import { SearchableMultiSelect } from "./SearchableMultiSelect";
 import { SearchableSelect } from "./SearchableSelect";
 import { SegmentedToggle } from "./SegmentedToggle";
@@ -19,12 +18,6 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
-
-const countries = [
-  { value: "CO", label: "Colombia" },
-  { value: "PE", label: "Perú" },
-  { value: "US", label: "Estados Unidos" },
-];
 
 const units = [
   { value: "fisica", label: "Instituto de Física" },
@@ -43,29 +36,6 @@ export const Inputs: Story = {
       <Input aria-label="Asunto con valor" defaultValue="Congreso de Física 2026" />
     </div>
   ),
-};
-
-function NativeSelectDemo() {
-  const [value, setValue] = useState("CO");
-  return (
-    <div className="grid max-w-3xl grid-cols-2 gap-6">
-      <NativeSelect
-        label="País"
-        options={countries}
-        value={value}
-        onChange={(event) => setValue(event.currentTarget.value)}
-        onClear={() => setValue("")}
-        helperText="El cambio se comunica con el evento nativo."
-      />
-      <NativeSelect label="País con error" options={countries} defaultValue="PE" state="error" helperText="Revisa el país." />
-      <NativeSelect label="País válido" options={countries} defaultValue="US" state="success" />
-      <NativeSelect label="País deshabilitado" options={countries} defaultValue="CO" disabled />
-    </div>
-  );
-}
-
-export const NativeSelects: Story = {
-  render: () => <NativeSelectDemo />,
 };
 
 function SearchableSelectDemo() {

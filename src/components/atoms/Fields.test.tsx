@@ -5,7 +5,6 @@ import { Checkbox } from "./Checkbox";
 import { Input } from "./Input";
 import { SearchableMultiSelect } from "./SearchableMultiSelect";
 import { SearchableSelect } from "./SearchableSelect";
-import { Select as NativeSelect } from "./Select";
 import { Textarea } from "./Textarea";
 
 const choices = [
@@ -13,35 +12,6 @@ const choices = [
   { value: "math", label: "Instituto de Matemáticas" },
   { value: "biology", label: "Instituto de Biología" },
 ];
-
-describe("NativeSelect", () => {
-  it("associates labels and helper text and supports uncontrolled clearing", async () => {
-    const user = userEvent.setup();
-    const onClear = vi.fn();
-    render(
-      <>
-        <NativeSelect
-          label="País"
-          options={[{ value: "CO", label: "Colombia" }, { value: "PE", label: "Perú" }]}
-          defaultValue="CO"
-          state="error"
-          helperText="Selecciona un país válido."
-          aria-describedby="country-hint"
-          onClear={onClear}
-        />
-        <p id="country-hint">Información adicional</p>
-      </>,
-    );
-    const select = screen.getByRole("combobox", { name: "País" });
-    expect(select).toHaveAttribute("aria-invalid", "true");
-    expect(select.getAttribute("aria-describedby")).toContain("country-hint");
-    const helperText = screen.getByText("Selecciona un país válido.");
-    expect(select.getAttribute("aria-describedby")?.split(" ")).toContain(helperText.id);
-    await user.click(screen.getByRole("button", { name: "Limpiar selección" }));
-    expect(select).toHaveValue("");
-    expect(onClear).toHaveBeenCalledOnce();
-  });
-});
 
 describe("SearchableSelect", () => {
   it("filters accent-insensitively and selects with the keyboard", async () => {

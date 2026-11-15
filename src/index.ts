@@ -17,13 +17,6 @@ export { Input, type FieldState, type InputProps, type InputSize } from "./compo
 export { Label, type LabelProps } from "./components/atoms/Label";
 export { PingDot, type PingDotProps } from "./components/atoms/PingDot";
 export {
-  Select as NativeSelect,
-  type SelectOption as NativeSelectOption,
-  type SelectProps as NativeSelectProps,
-  type SelectSize as NativeSelectSize,
-  type SelectState as NativeSelectState,
-} from "./components/atoms/Select";
-export {
   SearchableMultiSelect,
   type SearchableMultiSelectOption,
   type SearchableMultiSelectProps,
