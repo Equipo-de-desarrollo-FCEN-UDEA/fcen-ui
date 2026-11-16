@@ -39,7 +39,7 @@ export const UserMenu = ({
 }: UserMenuProps) => (
   <div
     className={clsx(
-      "flex w-80 flex-col gap-1 rounded-xl border border-gray-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900",
+      "flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-1 rounded-xl border border-gray-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900",
       className,
     )}
   >

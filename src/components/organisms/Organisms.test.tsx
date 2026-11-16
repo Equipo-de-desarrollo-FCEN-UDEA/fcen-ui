@@ -156,6 +156,23 @@ describe("TopBar", () => {
   });
 });
 
+describe("TopBar and UserMenu on narrow screens", () => {
+  it("keep the buttons named and the menu inside the screen", () => {
+    render(
+      <>
+        <TopBar name="Juan Giraldo" onToggleTheme={vi.fn()} onSignOut={vi.fn()} />
+        <UserMenu name="Juan Giraldo" options={capacities} value="director" onChange={vi.fn()} />
+      </>,
+    );
+
+    expect(screen.getByRole("button", { name: "Salir" })).toHaveClass("max-sm:[&_.truncate]:sr-only");
+    expect(screen.getByText("Claro")).toHaveClass("max-sm:sr-only");
+    expect(screen.getByText("Juan Giraldo", { selector: "div > div > span" }).closest(".w-80")).toHaveClass(
+      "max-w-[calc(100vw-2rem)]",
+    );
+  });
+});
+
 describe("Layout", () => {
   it("renders the shell with its header, content and footer", () => {
     render(
