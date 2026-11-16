@@ -125,6 +125,31 @@ export const Home: Story = {
   ),
 };
 
+export const TilesInAPhone: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex flex-col gap-6">
+      {[224, 308].map((width) => (
+        <div key={width} style={{ width }} className="flex flex-col gap-3">
+          <HeroNavTile
+            label="Administradores del sistema"
+            icon={Plus}
+            watermark={Plane}
+            onClick={ignore}
+            detail={
+              <>
+                <PingDot tone="success" />2 activos
+              </>
+            }
+          />
+          <NavTile label="Diagnóstico de calidades" icon={FileText} onClick={ignore} order={1} />
+          <NavTile label="Comisiones del SIGA anterior" icon={History} onClick={ignore} order={2} />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 const statusTiles = [
   { label: "Solicitadas", count: 12, tone: "info", icon: Send },
   { label: "Con visto bueno", count: 4, tone: "review", icon: ThumbsUp },

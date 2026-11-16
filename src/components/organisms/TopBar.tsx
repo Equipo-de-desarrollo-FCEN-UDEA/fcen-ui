@@ -102,7 +102,7 @@ export const TopBar = ({
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200"
           >
             {theme === "dark" ? <Moon size={14} aria-hidden /> : <Sun size={14} aria-hidden />}
-            {theme === "dark" ? "Oscuro" : "Claro"}
+            <span className="max-sm:sr-only">{theme === "dark" ? "Oscuro" : "Claro"}</span>
           </button>
         )}
         {onSignOut && (
@@ -113,6 +113,7 @@ export const TopBar = ({
             onClick={onSignOut}
             isLoading={signingOut}
             loadingText="Saliendo…"
+            className="max-sm:[&_.truncate]:sr-only"
           />
         )}
       </div>

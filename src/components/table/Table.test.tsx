@@ -115,6 +115,20 @@ describe("Table cells", () => {
     expect(screen.getByText("Ana Villa").nextElementSibling).toBeNull();
   });
 
+  it("wraps the names on narrow tables instead of cutting them", () => {
+    render(
+      <>
+        <TablePerson name="Ricardo Antonio Alzate Cano" detail="Profesor · Instituto de Física" />
+        <TableTitle title="Congreso de Física Médica" subtitle="Ciudad de México, Ciudad de México, México" />
+      </>,
+    );
+
+    for (const text of ["Ricardo Antonio Alzate Cano", "Profesor · Instituto de Física", "Congreso de Física Médica", "Ciudad de México, Ciudad de México, México"]) {
+      expect(screen.getByText(text)).toHaveClass("@5xl:truncate");
+      expect(screen.getByText(text)).not.toHaveClass("truncate");
+    }
+  });
+
   it("mutes the title when asked", () => {
     render(
       <>

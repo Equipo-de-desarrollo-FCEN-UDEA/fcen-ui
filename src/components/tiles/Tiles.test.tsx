@@ -33,6 +33,22 @@ describe("NavTile and HeroNavTile", () => {
     expect(screen.getByText("Lista para solicitar")).toBeInTheDocument();
   });
 
+  it("shrink with their card and keep the title whole", () => {
+    render(
+      <>
+        <NavTile label="Diagnóstico de calidades" icon={FileText} onClick={vi.fn()} />
+        <HeroNavTile label="Administradores del sistema" icon={Plus} watermark={Plane} onClick={vi.fn()} />
+      </>,
+    );
+
+    for (const name of [/Diagnóstico de calidades/, /Administradores del sistema/]) {
+      expect(screen.getByRole("button", { name })).toHaveClass("@container");
+    }
+    expect(screen.getByText("Administradores del sistema")).toHaveClass("@max-xs:text-lg");
+    const heroIcon = screen.getByRole("button", { name: /Administradores/ }).querySelectorAll("svg")[1].parentElement;
+    expect(heroIcon).toHaveClass("@max-3xs:hidden");
+  });
+
   it("render without detail", () => {
     render(
       <>
