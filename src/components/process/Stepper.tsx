@@ -32,8 +32,15 @@ const accents = {
   },
 };
 
+const HIDDEN_WHEN_NARROW = "@max-[6rem]:sr-only";
+const ONE_LINE_WHEN_NARROW = "@max-[6rem]:whitespace-nowrap";
+
 function isReached(state: StepState): boolean {
   return state !== "upcoming";
+}
+
+function isInFocus(state: StepState): boolean {
+  return state !== "done" && state !== "upcoming";
 }
 
 export const Stepper = ({ steps, accent = "success", size = "sm", label, className }: StepperProps) => {
@@ -65,7 +72,7 @@ export const Stepper = ({ steps, accent = "success", size = "sm", label, classNa
             key={step.label}
             aria-current={step.state === "current" ? "step" : undefined}
             data-state={step.state}
-            className="relative flex flex-1 flex-col items-center gap-2"
+            className="@container relative flex flex-1 flex-col items-center gap-2"
           >
             {next && (
               <span
@@ -96,7 +103,15 @@ export const Stepper = ({ steps, accent = "success", size = "sm", label, classNa
               {step.state === "current" && accent === "success" && <PingDot tone="success" />}
               {(step.state === "upcoming" || (step.state === "current" && accent === "brand")) && index + 1}
             </span>
-            <span className={clsx("px-1 text-center text-xs", labelClass)}>{step.label}</span>
+            <span
+              className={clsx(
+                "px-1 text-center text-xs",
+                labelClass,
+                isInFocus(step.state) ? ONE_LINE_WHEN_NARROW : HIDDEN_WHEN_NARROW,
+              )}
+            >
+              {step.label}
+            </span>
           </li>
         );
       })}

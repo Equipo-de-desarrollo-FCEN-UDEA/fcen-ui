@@ -246,6 +246,28 @@ export const WizardSteps: Story = {
   ),
 };
 
+export const WizardStepsInAPhoneCard: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <section
+      style={{ width: 343 }}
+      className="rounded-3xl border border-gray-200 bg-white px-6 py-5 dark:border-slate-700 dark:bg-slate-900"
+    >
+      <Stepper
+        accent="brand"
+        label="Pasos de la solicitud"
+        steps={[
+          { label: "Asunto", state: "done" },
+          { label: "Fechas", state: "done" },
+          { label: "Lugar e idioma", state: "current" },
+          { label: "Justificación", state: "upcoming" },
+          { label: "Documentos", state: "upcoming" },
+        ]}
+      />
+    </section>
+  ),
+};
+
 export const FooterExample: Story = {
   render: () => (
     <div className="w-full">

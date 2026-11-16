@@ -34,6 +34,19 @@ describe("Stepper", () => {
     expect(screen.getByText("2")).toBeInTheDocument();
   });
 
+  it("keeps only the step in focus labelled when each step is narrow", () => {
+    render(<Stepper steps={steps} label="Estado" />);
+
+    for (const item of screen.getAllByRole("listitem")) {
+      expect(item).toHaveClass("@container");
+    }
+    expect(screen.getByText("Visto bueno")).toHaveClass("@max-[6rem]:whitespace-nowrap");
+    expect(screen.getByText("Visto bueno")).not.toHaveClass("@max-[6rem]:sr-only");
+    for (const name of ["Solicitada", "Aprobada", "Finalizada"]) {
+      expect(screen.getByText(name)).toHaveClass("@max-[6rem]:sr-only");
+    }
+  });
+
   it("shows the returned and rejected states", () => {
     render(
       <Stepper
