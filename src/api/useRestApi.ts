@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { joinUrl, readResult, requestJson, sendRequest, type HttpMethod } from "./http";
+import { joinUrl, requestFile, requestJson, type FetchedFile, type HttpMethod } from "./http";
 import { useRestApiConfig } from "./RestApiProvider";
 
 export type RequestRecord<TAnnotation = unknown> = {
@@ -37,6 +37,7 @@ export type UseRestApiResult<TResponse, TError = string> = {
   doDeletePath: <T = unknown>(target: string, annotation?: unknown) => Promise<T>;
   doDeleteData: <T = unknown>(body: unknown, annotation?: unknown) => Promise<T>;
   doDownload: (target: string, filename: string) => Promise<void>;
+  doFetchFile: (target: string) => Promise<FetchedFile | null>;
   succeededRequests: RequestRecord[];
   failedRequests: RequestRecord[];
   clearSucceededRequests: () => void;
@@ -112,10 +113,8 @@ export function useRestApi<TResponse = unknown, TError = string>(
     async (target: string, filename: string) => {
       setPending((count) => count + 1);
       try {
-        const sent = await sendRequest(config, "GET", target);
-        const { response } = sent;
-        if (!response.ok) await readResult(sent);
-        const objectUrl = URL.createObjectURL(await response.blob());
+        const { blob } = await requestFile(config, target);
+        const objectUrl = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = objectUrl;
         anchor.download = filename;
@@ -123,6 +122,26 @@ export function useRestApi<TResponse = unknown, TError = string>(
         anchor.click();
         anchor.remove();
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+      } finally {
+        setPending((count) => count - 1);
+      }
+    },
+    [config],
+  );
+
+  const doFetchFile = useCallback(
+    async (target: string): Promise<FetchedFile | null> => {
+      const record = { requestMethod: "GET" as const, target };
+      setPending((count) => count + 1);
+      setError(null);
+      try {
+        const file = await requestFile(config, target);
+        setSucceededRequests((records) => appendRecord(records, { ...record, response: file }));
+        return file;
+      } catch (reason) {
+        setError(messageOf(reason) as TError);
+        setFailedRequests((records) => appendRecord(records, { ...record, response: null, error: reason }));
+        return null;
       } finally {
         setPending((count) => count - 1);
       }
@@ -149,6 +168,7 @@ export function useRestApi<TResponse = unknown, TError = string>(
     doDeletePath: (target, annotation) => run("DELETE", target, undefined, { annotation }),
     doDeleteData: (body, annotation) => run("DELETE", url, body, { annotation }),
     doDownload,
+    doFetchFile,
     succeededRequests,
     failedRequests,
     clearSucceededRequests: () => setSucceededRequests([]),

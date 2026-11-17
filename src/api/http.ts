@@ -27,6 +27,11 @@ export type SentRequest = {
   readResponse?: ResponseReader;
 };
 
+export type FetchedFile = {
+  blob: Blob;
+  fileName?: string;
+};
+
 export class ApiError extends Error {
   status: number;
   detail: unknown;
@@ -38,6 +43,9 @@ export class ApiError extends Error {
     this.detail = detail;
   }
 }
+
+const ENCODED_FILE_NAME = /filename\*\s*=\s*[\w-]*'[^']*'([^;]+)/i;
+const PLAIN_FILE_NAME = /filename\s*=\s*"?([^";]+)"?/i;
 
 function isAbsoluteUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);
@@ -140,6 +148,28 @@ export async function readResult({ response, readResponse }: SentRequest): Promi
   const payload = readResponse ? await readResponse(raw, response) : raw;
   if (!response.ok) throw new ApiError(errorMessageOf(payload, response.status), response.status, payload);
   return payload;
+}
+
+function decodedName(value: string): string | undefined {
+  try {
+    return decodeURIComponent(value.trim());
+  } catch {
+    return undefined;
+  }
+}
+
+export function fileNameOf(disposition: string | null): string | undefined {
+  const header = disposition ?? "";
+  const encoded = ENCODED_FILE_NAME.exec(header);
+  const name = encoded ? decodedName(encoded[1]) : undefined;
+  return name ?? PLAIN_FILE_NAME.exec(header)?.[1].trim();
+}
+
+export async function requestFile(config: RestApiConfig, target: string): Promise<FetchedFile> {
+  const sent = await sendRequest(config, "GET", target);
+  if (!sent.response.ok) await readResult(sent);
+  const blob = await sent.response.blob();
+  return { blob, fileName: fileNameOf(sent.response.headers.get("content-disposition")) };
 }
 
 export async function requestJson(

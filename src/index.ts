@@ -40,6 +40,8 @@ export { Textarea, type TextareaProps } from "./components/atoms/Textarea";
 export { Tooltip, type TooltipPosition, type TooltipProps } from "./components/atoms/Tooltip";
 export { EmptyState, type EmptyStateProps } from "./components/molecules/EmptyState";
 export { CollapsiblePanel, type CollapsiblePanelProps } from "./components/molecules/CollapsiblePanel";
+export { DatePicker, type DatePickerProps } from "./components/molecules/DatePicker";
+export { DateRangePicker, type DateRange, type DateRangePickerProps } from "./components/molecules/DateRangePicker";
 export { Dropdown, type DropdownOption, type DropdownProps } from "./components/molecules/Dropdown";
 export {
   DropdownAcademicUnit,
@@ -86,6 +88,12 @@ export {
   type UserMenuProps,
 } from "./components/organisms/UserMenu";
 export { EntityPickerModal, type EntityPickerModalProps } from "./components/organisms/EntityPickerModal";
+export {
+  DocumentViewer,
+  documentKind,
+  type DocumentKind,
+  type DocumentViewerProps,
+} from "./components/organisms/DocumentViewer";
 export { useCountUp } from "./hooks/useCountUp";
 export {
   DEFAULT_COUNTRY,
@@ -130,8 +138,10 @@ export {
   ApiError,
   joinUrl,
   readResult,
+  requestFile,
   requestJson,
   sendRequest,
+  type FetchedFile,
   type HttpMethod,
   type PreparedRequest,
   type RequestContext,

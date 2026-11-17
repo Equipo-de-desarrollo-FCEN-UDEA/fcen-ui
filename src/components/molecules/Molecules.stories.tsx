@@ -6,6 +6,8 @@ import { Input } from "../atoms/Input";
 import { Textarea } from "../atoms/Textarea";
 import { EntityPickerModal } from "../organisms/EntityPickerModal";
 import { CollapsiblePanel } from "./CollapsiblePanel";
+import { DatePicker, type DatePickerProps } from "./DatePicker";
+import { DateRangePicker, type DateRange, type DateRangePickerProps } from "./DateRangePicker";
 import { Dropdown } from "./Dropdown";
 import { DropdownAcademicUnit } from "./DropdownAcademicUnit";
 import { EmptyState } from "./EmptyState";
@@ -95,6 +97,93 @@ function SelectDemo() {
 
 export const Selects: Story = {
   render: () => <SelectDemo />,
+};
+
+type DatePickerDemoProps = Partial<Omit<DatePickerProps, "value" | "onChange">> & { initial?: string };
+
+function DatePickerDemo({ initial = "", ...props }: Readonly<DatePickerDemoProps>) {
+  const [value, setValue] = useState(initial);
+  return (
+    <div className="max-w-xs">
+      <DatePicker aria-label="Fecha de salida" {...props} value={value} onChange={setValue} />
+    </div>
+  );
+}
+
+export const DatePickerEmpty: Story = {
+  render: () => <DatePickerDemo />,
+};
+
+export const DatePickerWithValue: Story = {
+  render: () => <DatePickerDemo initial="2026-11-16" />,
+};
+
+export const DatePickerInvalid: Story = {
+  render: () => (
+    <div className="flex max-w-xs flex-col gap-1.5">
+      <DatePickerDemo label="Fecha de salida" invalid aria-describedby="departure-date-error" />
+      <p id="departure-date-error" className="text-xs text-red-600 dark:text-rose-400">
+        La fecha de salida es obligatoria
+      </p>
+    </div>
+  ),
+};
+
+export const DatePickerWithLimits: Story = {
+  render: () => <DatePickerDemo initial="2026-11-16" min="2026-11-10" max="2026-12-05" />,
+};
+
+export const DatePickerDisabled: Story = {
+  render: () => <DatePickerDemo initial="2026-11-16" disabled />,
+};
+
+type DateRangePickerDemoProps = Partial<Omit<DateRangePickerProps, "from" | "to" | "onChange">> & {
+  initial?: DateRange;
+};
+
+function DateRangePickerDemo({ initial = { from: "", to: "" }, ...props }: Readonly<DateRangePickerDemoProps>) {
+  const [range, setRange] = useState(initial);
+  return (
+    <div className="max-w-xs">
+      <DateRangePicker
+        aria-label="Fechas de la comisión"
+        placeholder="Fechas de la comisión"
+        {...props}
+        from={range.from}
+        to={range.to}
+        onChange={setRange}
+      />
+    </div>
+  );
+}
+
+export const DateRangePickerEmpty: Story = {
+  render: () => <DateRangePickerDemo />,
+};
+
+export const DateRangePickerWithRange: Story = {
+  render: () => <DateRangePickerDemo initial={{ from: "2026-11-09", to: "2026-11-20" }} />,
+};
+
+export const DateRangePickerPartial: Story = {
+  render: () => <DateRangePickerDemo initial={{ from: "2026-10-01", to: "" }} />,
+};
+
+export const DateRangePickerInvalid: Story = {
+  render: () => (
+    <div className="flex max-w-xs flex-col gap-1.5">
+      <DateRangePickerDemo invalid aria-describedby="commission-dates-error" />
+      <p id="commission-dates-error" className="text-xs text-red-600 dark:text-rose-400">
+        Las fechas de la comisión son obligatorias
+      </p>
+    </div>
+  ),
+};
+
+export const DateRangePickerWithLimits: Story = {
+  render: () => (
+    <DateRangePickerDemo initial={{ from: "2026-11-03", to: "2026-11-07" }} min="2026-11-01" max="2026-12-15" />
+  ),
 };
 
 const intents: { intent: ModalIntent; title: string; description: string; action: string; icon?: typeof Check }[] = [

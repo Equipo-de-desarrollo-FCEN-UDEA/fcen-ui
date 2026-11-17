@@ -38,6 +38,8 @@ export default defineConfig({
         "lucide-react",
         "libphonenumber-js/min",
         "libphonenumber-js/min/metadata",
+        "docx-preview",
+        /^pdfjs-dist(\/|$)/,
       ],
       output: {
         preserveModules: true,

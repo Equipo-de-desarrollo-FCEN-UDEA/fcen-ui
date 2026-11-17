@@ -1,4 +1,4 @@
-import { CircleCheck, FileText, Trash2, TriangleAlert } from "lucide-react";
+import { CircleCheck, Eye, FileText, Trash2, TriangleAlert } from "lucide-react";
 import clsx from "clsx";
 
 export type FileItemState = "uploaded" | "uploading" | "error";
@@ -10,10 +10,22 @@ export type FileItemProps = {
   progress?: number;
   onRemove?: () => void;
   removeLabel?: string;
+  onView?: () => void;
+  viewLabel?: string;
   className?: string;
 };
 
-export const FileItem = ({ name, state, detail, progress = 0, onRemove, removeLabel, className }: FileItemProps) => {
+export const FileItem = ({
+  name,
+  state,
+  detail,
+  progress = 0,
+  onRemove,
+  removeLabel,
+  onView,
+  viewLabel = "Ver",
+  className,
+}: FileItemProps) => {
   const percent = Math.min(100, Math.max(0, Math.round(progress)));
 
   return (
@@ -63,6 +75,17 @@ export const FileItem = ({ name, state, detail, progress = 0, onRemove, removeLa
       </div>
       {state === "uploaded" && <CircleCheck size={18} aria-hidden className="shrink-0 text-emerald-600" />}
       {state === "error" && <TriangleAlert size={18} aria-hidden className="shrink-0 text-rose-600" />}
+      {onView && (
+        <button
+          type="button"
+          onClick={onView}
+          aria-label={`${viewLabel} ${name}`}
+          className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:text-brand-300 dark:hover:bg-brand-500/10"
+        >
+          <Eye size={16} aria-hidden />
+          {viewLabel}
+        </button>
+      )}
       {onRemove && (
         <button
           type="button"

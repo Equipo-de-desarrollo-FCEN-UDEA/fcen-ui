@@ -7,7 +7,7 @@ import { Button, type ButtonVariant } from "../atoms/Button";
 import { tones, type Tone } from "../../theme/tones";
 
 export type ModalIntent = "neutral" | "success" | "warning" | "danger";
-export type ModalSize = "md" | "lg";
+export type ModalSize = "md" | "lg" | "xl";
 
 export type ModalAction = {
   label: string;
@@ -29,10 +29,12 @@ export type ModalProps = {
   size?: ModalSize;
   children?: ReactNode;
   actions?: ModalAction[];
+  headerActions?: ReactNode;
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
   closeLabel?: string;
   className?: string;
+  bodyClassName?: string;
 };
 
 const intents: Record<ModalIntent, { tone: Tone; icon: LucideIcon }> = {
@@ -45,6 +47,7 @@ const intents: Record<ModalIntent, { tone: Tone; icon: LucideIcon }> = {
 const sizes: Record<ModalSize, string> = {
   md: "max-w-lg",
   lg: "max-w-2xl",
+  xl: "max-w-5xl",
 };
 
 const FOCUSABLE =
@@ -64,10 +67,12 @@ export const Modal = ({
   size = "md",
   children,
   actions,
+  headerActions,
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeLabel = "Cerrar",
   className,
+  bodyClassName,
 }: ModalProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -97,6 +102,7 @@ export const Modal = ({
 
   const { tone, icon: defaultIcon } = intents[intent];
   const Icon = icon ?? defaultIcon;
+  const wide = size === "xl";
   const styles = tones[tone];
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -122,6 +128,18 @@ export const Modal = ({
     if (closeOnBackdropClick) onClose();
   };
 
+  const closeButton = showCloseButton && (
+    <button
+      type="button"
+      data-modal-close="true"
+      onClick={onClose}
+      aria-label={closeLabel}
+      className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-[10px] text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:hover:bg-slate-800 dark:hover:text-gray-300"
+    >
+      <X size={16} aria-hidden />
+    </button>
+  );
+
   return createPortal(
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div
@@ -145,19 +163,32 @@ export const Modal = ({
             className,
           )}
         >
-          <div className={clsx("flex items-start gap-4 pt-6 pr-5 pl-6", children ? "pb-4" : "pb-5")}>
+          <div
+            className={clsx(
+              "flex items-start gap-4 pt-6 pr-5 pl-6",
+              wide && "max-sm:gap-3 max-sm:pt-4 max-sm:pr-3 max-sm:pl-4",
+              children ? "pb-4" : "pb-5",
+            )}
+          >
             <span
               className={clsx(
                 "grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border",
                 styles.soft,
                 styles.softBorder,
                 styles.softText,
+                wide && "max-sm:hidden",
               )}
             >
               <Icon size={22} aria-hidden />
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-1 pt-0.5">
-              <h2 id={titleId} className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+              <h2
+                id={titleId}
+                className={clsx(
+                  "text-lg font-semibold wrap-anywhere text-gray-900 dark:text-gray-50",
+                  wide && "max-sm:text-base",
+                )}
+              >
                 {title}
               </h2>
               {description && (
@@ -166,19 +197,16 @@ export const Modal = ({
                 </div>
               )}
             </div>
-            {showCloseButton && (
-              <button
-                type="button"
-                data-modal-close="true"
-                onClick={onClose}
-                aria-label={closeLabel}
-                className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-[10px] text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:hover:bg-slate-800 dark:hover:text-gray-300"
-              >
-                <X size={16} aria-hidden />
-              </button>
+            {headerActions ? (
+              <div className="flex shrink-0 items-center gap-1">
+                {headerActions}
+                {closeButton}
+              </div>
+            ) : (
+              closeButton
             )}
           </div>
-          {children && <div className="flex-1 overflow-y-auto px-6 pt-1 pb-6">{children}</div>}
+          {children && <div className={clsx("flex-1 overflow-y-auto", bodyClassName ?? "px-6 pt-1 pb-6")}>{children}</div>}
           {actions && actions.length > 0 && (
             <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-800/60">
               {actions.map((action) => (
