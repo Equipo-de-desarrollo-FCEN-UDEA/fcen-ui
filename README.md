@@ -47,6 +47,8 @@ const config = {
 const { data, loading, doPost } = useRestApi<Room[]>(roomsApi.list);
 ```
 
+`doFetchFile(path)` goes through the same pipeline and returns `{ blob, fileName }`, or `null` after recording the failure, so a document can be shown in `DocumentViewer` instead of downloaded. `fileName` comes from `Content-Disposition`, which the API has to expose through CORS.
+
 ## Brand
 
 The brand palette lives in `--color-brand-50` … `--color-brand-900` (UdeA green by default). Another brand overrides those variables after importing the theme:
@@ -59,17 +61,35 @@ The brand palette lives in `--color-brand-50` … `--color-brand-900` (UdeA gree
 
 Dark mode follows the `dark` class on `<html>`.
 
+## Dates
+
+`DatePicker` and `DateRangePicker` take and emit ISO dates (`YYYY-MM-DD`, or `""` when empty), the same strings the apps keep in the URL and send to the API, and show them as `dd/mm/aaaa`:
+
+```tsx
+<DateRangePicker
+  aria-label="Fechas de la comisión"
+  placeholder="Fechas de la comisión"
+  from={filters.from}
+  to={filters.to}
+  onChange={({ from, to }) => setFilters({ ...filters, from, to })}
+/>
+```
+
+## Documents
+
+`DocumentViewer` shows PDF, Word `.docx` and image files inside a modal and offers the download for anything else. `pdfjs-dist` and `docx-preview` load with a dynamic `import()` the first time a document opens, so apps that never open one do not ship them in their main bundle. The PDF worker runs in the page, which needs no bundler setup in the consuming app.
+
 ## What is inside
 
 | Group | Components |
 | --- | --- |
 | Atoms | Button, StatusBadge, PingDot, Avatar, CodePill, Chip, Label, Spinner, Tooltip, Input, Textarea, Checkbox, SegmentedToggle, AnimatedCount, Card, CountryFlag, SearchableSelect, SearchableMultiSelect |
-| Molecules | FormField, Select, Modal, Toast, Toaster and `toast`, EmptyState, Pagination, SummaryCard, CollapsiblePanel, Dropdown, DropdownAcademicUnit, MultiSelectChips, PhoneInput, SelectionSummaryCard, TableSkeleton |
+| Molecules | FormField, Select, DatePicker, DateRangePicker, Modal, Toast, Toaster and `toast`, EmptyState, Pagination, SummaryCard, CollapsiblePanel, Dropdown, DropdownAcademicUnit, MultiSelectChips, PhoneInput, SelectionSummaryCard, TableSkeleton |
 | Tiles | NavTile, HeroNavTile, StatusTile |
 | Process | Stepper, Timeline, TimelineItem, FileDrop, FileItem |
 | Records | RecordCard, RecordRow |
 | Tables | Table, DataTable and table cell components |
-| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell, EntityPickerModal |
+| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell, EntityPickerModal, DocumentViewer |
 
 Every component has its stories in Storybook, matching the Figma file of SIGA v4, with a light and dark toggle. The test suite also renders every story and checks it with axe.
 

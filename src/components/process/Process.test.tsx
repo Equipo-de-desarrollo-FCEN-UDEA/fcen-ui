@@ -197,6 +197,23 @@ describe("FileItem", () => {
     expect(screen.getByRole("button", { name: "Eliminar" })).toBeInTheDocument();
   });
 
+  it("opens the file from a view button placed before the remove button", async () => {
+    const onView = vi.fn();
+    const { rerender } = render(<FileItem name="carta.pdf" state="uploaded" onView={onView} onRemove={vi.fn()} />);
+    const view = screen.getByRole("button", { name: "Ver carta.pdf" });
+
+    expect(view).toHaveTextContent("Ver");
+    expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Ver carta.pdf",
+      "Quitar carta.pdf",
+    ]);
+    await userEvent.click(view);
+    expect(onView).toHaveBeenCalledOnce();
+
+    rerender(<FileItem name="carta.pdf" state="uploaded" onView={onView} viewLabel="Abrir" />);
+    expect(screen.getByRole("button", { name: "Abrir carta.pdf" })).toHaveTextContent("Abrir");
+  });
+
   it("renders without detail or remove button", () => {
     render(<FileItem name="carta.pdf" state="uploaded" />);
 

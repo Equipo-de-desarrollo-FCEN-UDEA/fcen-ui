@@ -1,6 +1,15 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { ApiError, errorMessageOf, joinUrl, readPayload, requestJson, type RestApiConfig } from "./http";
+import {
+  ApiError,
+  errorMessageOf,
+  fileNameOf,
+  joinUrl,
+  readPayload,
+  requestFile,
+  requestJson,
+  type RestApiConfig,
+} from "./http";
 import { RestApiProvider } from "./RestApiProvider";
 import { useRestApi } from "./useRestApi";
 
@@ -26,6 +35,16 @@ afterEach(() => {
 });
 
 describe("http helpers", () => {
+  it("reads the file name from the content disposition", () => {
+    const encoded = "attachment; filename*=UTF-8''informe%20de%20comisi%C3%B3n.docx";
+    expect(fileNameOf(encoded)).toBe("informe de comisión.docx");
+    expect(fileNameOf('attachment; filename="carta.pdf"; size=10')).toBe("carta.pdf");
+    expect(fileNameOf("attachment; filename=acta.doc")).toBe("acta.doc");
+    expect(fileNameOf("attachment; filename*=UTF-8''%E0%A4%A; filename=\"respaldo.pdf\"")).toBe("respaldo.pdf");
+    expect(fileNameOf("inline")).toBeUndefined();
+    expect(fileNameOf(null)).toBeUndefined();
+  });
+
   it("joins base and path without doubling slashes", () => {
     expect(joinUrl("https://api.test/", "/rooms")).toBe("https://api.test/rooms");
     expect(joinUrl("https://api.test", "rooms")).toBe("https://api.test/rooms");
@@ -291,6 +310,72 @@ describe("useRestApi", () => {
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:file");
     await expect(result.current.doDownload("/reports/2/file", "otro.csv")).rejects.toMatchObject({ status: 410 });
     vi.useRealTimers();
+  });
+
+  it("fetches a file as a blob with its name and records the request", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response("%PDF-1.4", {
+        headers: { "content-type": "application/pdf", "content-disposition": 'attachment; filename="carta.pdf"' },
+      }),
+    );
+    const { result } = renderHook(() => useRestApi("/commissions", { manual: true }), { wrapper });
+
+    let pending: ReturnType<typeof result.current.doFetchFile> = Promise.resolve(null);
+    act(() => {
+      pending = result.current.doFetchFile("/commissions/7/documents/1");
+    });
+    expect(result.current.loadingRequests).toBe(true);
+    let file: Awaited<typeof pending> = null;
+    await act(async () => {
+      file = await pending;
+    });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.test/commissions/7/documents/1");
+    expect(file).toMatchObject({ fileName: "carta.pdf" });
+    expect(await (file as unknown as { blob: Blob }).blob.text()).toBe("%PDF-1.4");
+    expect(result.current.loadingRequests).toBe(false);
+    expect(result.current.succeededRequests[0]).toMatchObject({
+      requestMethod: "GET",
+      target: "/commissions/7/documents/1",
+    });
+  });
+
+  it("returns null and records a failed file request", async () => {
+    fetchMock.mockResolvedValueOnce(json({ detail: "El documento no existe." }, 404));
+    const { result } = renderHook(() => useRestApi("/commissions", { manual: true }), { wrapper });
+
+    let file: unknown = "pendiente";
+    await act(async () => {
+      file = await result.current.doFetchFile("/commissions/7/documents/9");
+    });
+
+    expect(file).toBeNull();
+    expect(result.current.error).toBe("El documento no existe.");
+    expect(result.current.loadingRequests).toBe(false);
+    expect(result.current.failedRequests[0]).toMatchObject({
+      requestMethod: "GET",
+      target: "/commissions/7/documents/9",
+      error: expect.objectContaining({ status: 404 }),
+    });
+  });
+
+  it("sends the session headers and retries a file request after a 401", async () => {
+    let token = "viejo";
+    const config: RestApiConfig = {
+      baseUrl: "https://api.test",
+      getHeaders: () => ({ Authorization: `Bearer ${token}` }),
+      onUnauthorized: async () => {
+        token = "nuevo";
+        return true;
+      },
+    };
+    fetchMock.mockResolvedValueOnce(json({ detail: "Sesión vencida" }, 401)).mockResolvedValueOnce(new Response("ok"));
+
+    const file = await requestFile(config, "/files/1");
+
+    expect(await file.blob.text()).toBe("ok");
+    expect(file.fileName).toBeUndefined();
+    expect(new Headers(fetchMock.mock.calls[1][1]?.headers).get("Authorization")).toBe("Bearer nuevo");
   });
 
   it("works without a provider", async () => {
