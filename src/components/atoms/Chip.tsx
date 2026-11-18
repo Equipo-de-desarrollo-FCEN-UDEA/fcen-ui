@@ -14,7 +14,7 @@ export const Chip = ({ label, onRemove, removeLabel, className }: ChipProps) => 
       className,
     )}
   >
-    <span className="truncate">{label}</span>
+    <span className="break-words">{label}</span>
     {onRemove && (
       <button
         type="button"

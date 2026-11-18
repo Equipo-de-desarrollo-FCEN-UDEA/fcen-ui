@@ -69,7 +69,7 @@ export const Dropdown = <T,>({
               type="button"
               role="menuitem"
               onClick={() => select(option)}
-              className="min-w-0 flex-1 truncate rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+              className="min-w-0 flex-1 break-words rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               {option.label}
             </button>

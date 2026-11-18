@@ -115,7 +115,7 @@ describe("Table cells", () => {
     expect(screen.getByText("Ana Villa").nextElementSibling).toBeNull();
   });
 
-  it("wraps the names on narrow tables instead of cutting them", () => {
+  it("wraps the names instead of cutting them, at any width", () => {
     render(
       <>
         <TablePerson name="Ricardo Antonio Alzate Cano" detail="Profesor · Instituto de Física" />
@@ -124,8 +124,8 @@ describe("Table cells", () => {
     );
 
     for (const text of ["Ricardo Antonio Alzate Cano", "Profesor · Instituto de Física", "Congreso de Física Médica", "Ciudad de México, Ciudad de México, México"]) {
-      expect(screen.getByText(text)).toHaveClass("@5xl:truncate");
-      expect(screen.getByText(text)).not.toHaveClass("truncate");
+      expect(screen.getByText(text)).toHaveClass("break-words");
+      expect(screen.getByText(text).className).not.toMatch(/truncate/);
     }
   });
 

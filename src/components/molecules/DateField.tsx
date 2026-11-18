@@ -152,7 +152,7 @@ export function DateField({
           disabled={disabled}
           onClick={() => setOpen((value) => !value)}
           className={clsx(
-            "flex h-10 w-full cursor-pointer items-center gap-2.5 pl-3.5 text-left text-base tabular-nums",
+            "flex min-h-10 w-full cursor-pointer items-center gap-2.5 py-2 pl-3.5 text-left text-base tabular-nums",
             colors.field.base,
             invalid ? colors.field.error : colors.field.idle,
             colors.field.disabled,
@@ -161,7 +161,7 @@ export function DateField({
           )}
         >
           <Calendar size={16} aria-hidden className="shrink-0 text-gray-400 dark:text-gray-500" />
-          <span id={textId} className={clsx("min-w-0 flex-1 truncate", !text && "text-gray-400 dark:text-gray-500")}>
+          <span id={textId} className={clsx("min-w-0 flex-1 break-words", !text && "text-gray-400 dark:text-gray-500")}>
             {text || placeholder}
           </span>
         </button>

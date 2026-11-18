@@ -245,7 +245,7 @@ export const SearchableSelect = ({
                 )}
               >
                 {option.icon}
-                <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                <span className="min-w-0 flex-1 break-words">{option.label}</span>
                 {option.value === value && <Check size={16} aria-hidden className="text-brand-600 dark:text-brand-300" />}
               </li>
             ))}

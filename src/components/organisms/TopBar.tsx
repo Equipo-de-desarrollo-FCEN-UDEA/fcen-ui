@@ -74,11 +74,11 @@ export const TopBar = ({
         >
           <Avatar name={name} />
           <span className="flex min-w-0 flex-col gap-1">
-            <span className="truncate text-sm font-semibold text-gray-700 dark:text-gray-100">{name}</span>
+            <span className="break-words text-sm font-semibold text-gray-700 dark:text-gray-100">{name}</span>
             {roleLabel && (
               <span className="inline-flex max-w-full items-center gap-1.5 self-start rounded-full border border-brand-100 bg-brand-50 py-0.5 pr-2 pl-2.5 text-xs font-semibold text-brand-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200">
                 <RoleIcon size={12} aria-hidden className="shrink-0" />
-                <span className="truncate">{roleLabel}</span>
+                <span className="break-words">{roleLabel}</span>
               </span>
             )}
           </span>
@@ -113,7 +113,7 @@ export const TopBar = ({
             onClick={onSignOut}
             isLoading={signingOut}
             loadingText="Saliendo…"
-            className="max-sm:[&_.truncate]:sr-only"
+            className="max-sm:[&_[data-button-label]]:sr-only"
           />
         )}
       </div>

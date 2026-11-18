@@ -65,7 +65,7 @@ export const RecordCard = ({
         <StatusBadge label={status.label} tone={status.tone} />
         {code && <CodePill code={code} />}
       </span>
-      <span className="line-clamp-2 text-base font-semibold text-gray-900 dark:text-gray-50">{title}</span>
+      <span className="break-words text-base font-semibold text-gray-900 dark:text-gray-50">{title}</span>
       {meta.length > 0 && (
         <span className="flex flex-col gap-1.5">
           {meta.map((item) => {
@@ -73,7 +73,7 @@ export const RecordCard = ({
             return (
               <span key={item.text} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Icon size={14} aria-hidden className="shrink-0 text-gray-400" />
-                <span className="truncate">{item.text}</span>
+                <span className="break-words">{item.text}</span>
               </span>
             );
           })}
