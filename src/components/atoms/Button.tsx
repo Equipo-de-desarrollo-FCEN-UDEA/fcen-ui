@@ -70,7 +70,7 @@ export const Button = ({
     >
       {isLoading && <Spinner size={spinnerSizes[size]} label={loadingText ?? "Cargando"} className="text-current" />}
       {iconLeft && !isLoading && <span className="shrink-0">{iconLeft}</span>}
-      {hasText && <span className={clsx("truncate", isLoading && "opacity-90")}>{text}</span>}
+      {hasText && <span data-button-label className={clsx("break-words", isLoading && "opacity-90")}>{text}</span>}
       {iconRight && !isLoading && <span className="shrink-0">{iconRight}</span>}
     </button>
   );

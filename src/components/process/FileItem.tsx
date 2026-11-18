@@ -48,7 +48,7 @@ export const FileItem = ({
         <FileText size={20} aria-hidden />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{name}</span>
+        <span className="break-words text-sm font-medium text-gray-900 dark:text-gray-100">{name}</span>
         {state === "uploading" ? (
           <span
             role="progressbar"
@@ -66,7 +66,7 @@ export const FileItem = ({
         ) : (
           detail && (
             <span
-              className={clsx("truncate text-xs", state === "error" ? "text-rose-600 dark:text-rose-400" : "text-gray-500")}
+              className={clsx("break-words text-xs", state === "error" ? "text-rose-600 dark:text-rose-400" : "text-gray-500")}
             >
               {detail}
             </span>

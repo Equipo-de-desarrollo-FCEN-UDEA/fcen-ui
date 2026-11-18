@@ -62,24 +62,24 @@ export const RecordRow = ({
         <span className="flex min-w-0 items-center gap-3">
           <Avatar name={person.name} />
           <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="truncate text-sm font-semibold text-gray-900 dark:text-gray-50">{person.name}</span>
-            {person.detail && <span className="truncate text-xs text-gray-500 dark:text-gray-400">{person.detail}</span>}
+            <span className="break-words text-sm font-semibold text-gray-900 dark:text-gray-50">{person.name}</span>
+            {person.detail && <span className="break-words text-xs text-gray-500 dark:text-gray-400">{person.detail}</span>}
           </span>
         </span>
       )}
       <span className="col-start-2 flex min-w-0 flex-col gap-0.5 md:col-start-auto">
-        <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{title}</span>
+        <span className="break-words text-sm font-medium text-gray-900 dark:text-gray-100">{title}</span>
         {place && PlaceIcon && (
           <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
             <PlaceIcon size={12} aria-hidden className="shrink-0" />
-            <span className="truncate">{place.text}</span>
+            <span className="break-words">{place.text}</span>
           </span>
         )}
       </span>
       <span className="col-start-2 flex min-w-0 flex-col gap-0.5 md:col-start-auto">
         {dates && (
           <>
-            <span className="truncate text-sm font-medium text-gray-700 dark:text-gray-200">{dates.primary}</span>
+            <span className="break-words text-sm font-medium text-gray-700 dark:text-gray-200">{dates.primary}</span>
             {dates.secondary && <span className="text-xs text-gray-500 dark:text-gray-400">{dates.secondary}</span>}
           </>
         )}

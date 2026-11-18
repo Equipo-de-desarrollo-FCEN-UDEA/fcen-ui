@@ -165,7 +165,7 @@ describe("TopBar and UserMenu on narrow screens", () => {
       </>,
     );
 
-    expect(screen.getByRole("button", { name: "Salir" })).toHaveClass("max-sm:[&_.truncate]:sr-only");
+    expect(screen.getByRole("button", { name: "Salir" })).toHaveClass("max-sm:[&_[data-button-label]]:sr-only");
     expect(screen.getByText("Claro")).toHaveClass("max-sm:sr-only");
     expect(screen.getByText("Juan Giraldo", { selector: "div > div > span" }).closest(".w-80")).toHaveClass(
       "max-w-[calc(100vw-2rem)]",

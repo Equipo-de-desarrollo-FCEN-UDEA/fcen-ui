@@ -20,7 +20,7 @@ export const SummaryCard = ({ label, value, icon: Icon, className }: SummaryCard
     </span>
     <span className="flex min-w-0 flex-col">
       <span className="text-xs font-medium text-brand-700 dark:text-brand-200">{label}</span>
-      <span className="truncate text-sm font-semibold text-brand-900 dark:text-white">{value}</span>
+      <span className="break-words text-sm font-semibold text-brand-900 dark:text-white">{value}</span>
     </span>
   </div>
 );

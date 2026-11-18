@@ -46,8 +46,8 @@ export const UserMenu = ({
     <div className="flex items-center gap-3 px-2 pt-2 pb-3">
       <Avatar name={name} />
       <div className="flex min-w-0 flex-col">
-        <span className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{name}</span>
-        {username && <span className="truncate text-xs text-gray-500 dark:text-gray-400">{username}</span>}
+        <span className="break-words text-sm font-semibold text-gray-900 dark:text-gray-100">{name}</span>
+        {username && <span className="break-words text-xs text-gray-500 dark:text-gray-400">{username}</span>}
       </div>
     </div>
     {options.length > 0 && (
@@ -82,13 +82,13 @@ export const UserMenu = ({
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span
                     className={clsx(
-                      "truncate text-sm font-semibold",
+                      "break-words text-sm font-semibold",
                       active ? "text-brand-800 dark:text-brand-200" : "text-gray-900 dark:text-gray-100",
                     )}
                   >
                     {option.label}
                   </span>
-                  {option.detail && <span className="truncate text-xs text-gray-500 dark:text-gray-400">{option.detail}</span>}
+                  {option.detail && <span className="break-words text-xs text-gray-500 dark:text-gray-400">{option.detail}</span>}
                 </span>
                 {active && <Check size={16} aria-hidden className="shrink-0 text-brand-600 dark:text-brand-300" />}
               </button>

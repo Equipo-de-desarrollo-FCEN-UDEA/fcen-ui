@@ -406,8 +406,8 @@ describe("Pagination", () => {
 
     for (const name of ["Anterior", "Siguiente"]) {
       const button = screen.getByRole("button", { name });
-      expect(button).toHaveClass("@max-md:[&_.truncate]:sr-only");
-      expect(within(button).getByText(name)).toHaveClass("truncate");
+      expect(button).toHaveClass("@max-md:[&_[data-button-label]]:sr-only");
+      expect(within(button).getByText(name)).toHaveAttribute("data-button-label");
     }
   });
 

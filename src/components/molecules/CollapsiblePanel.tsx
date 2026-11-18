@@ -38,8 +38,8 @@ export const CollapsiblePanel = ({
               {index}
             </span>
             <div className="min-w-0">
-              <h3 className="truncate text-base font-bold text-slate-800 dark:text-white">{title}</h3>
-              <p className="truncate text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+              <h3 className="break-words text-base font-bold text-slate-800 dark:text-white">{title}</h3>
+              <p className="break-words text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
             </div>
           </div>
           {error && <p role="alert" className="mt-2 text-sm font-medium text-red-600 dark:text-rose-400">{error}</p>}

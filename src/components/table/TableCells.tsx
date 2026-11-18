@@ -21,8 +21,8 @@ export const TablePerson = ({ name, detail }: TablePersonProps) => (
   <span className="flex min-w-0 basis-full items-center gap-2.5 @5xl:basis-auto">
     <Avatar name={name} />
     <span className="flex min-w-0 flex-col gap-0.5">
-      <span className="text-sm font-medium text-gray-900 @5xl:truncate dark:text-gray-100">{name}</span>
-      {detail && <span className="text-xs text-gray-500 @5xl:truncate dark:text-gray-400">{detail}</span>}
+      <span className="text-sm font-medium text-gray-900 break-words dark:text-gray-100">{name}</span>
+      {detail && <span className="text-xs text-gray-500 break-words dark:text-gray-400">{detail}</span>}
     </span>
   </span>
 );
@@ -31,13 +31,13 @@ export const TableTitle = ({ title, subtitle, muted = false }: TableTitleProps) 
   <span className="flex min-w-0 basis-full flex-col gap-0.5 @5xl:basis-auto">
     <span
       className={clsx(
-        "text-sm font-semibold @5xl:truncate",
+        "text-sm font-semibold break-words",
         muted ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-gray-100",
       )}
     >
       {title}
     </span>
-    {subtitle && <span className="text-xs text-gray-500 @5xl:truncate dark:text-gray-400">{subtitle}</span>}
+    {subtitle && <span className="text-xs text-gray-500 break-words dark:text-gray-400">{subtitle}</span>}
   </span>
 );
 

@@ -199,7 +199,7 @@ export const Select = ({
   };
 
   const controlClass = clsx(
-    "h-10 w-full pr-10 pl-3.5 text-left text-base",
+    "min-h-10 w-full py-2 pr-10 pl-3.5 text-left text-base",
     colors.field.base,
     state === "error" ? colors.field.error : colors.field.idle,
     open && state !== "error" && "border-brand-600 shadow-focus",
@@ -242,7 +242,7 @@ export const Select = ({
         />
       ) : (
         <button {...comboboxProps} type="button" onClick={toggle} className={controlClass}>
-          <span className={clsx("block truncate", !selected && "text-gray-400 dark:text-gray-500")}>
+          <span className={clsx("block break-words", !selected && "text-gray-400 dark:text-gray-500")}>
             {selected?.label ?? placeholder}
           </span>
         </button>
@@ -291,7 +291,7 @@ export const Select = ({
                     </span>
                   )}
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate">{option.label}</span>
+                    <span className="block break-words">{option.label}</span>
                     {option.description && (
                       <span className="block text-xs leading-snug font-normal text-gray-500 dark:text-gray-400">
                         {option.description}

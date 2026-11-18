@@ -21,7 +21,7 @@ type CompactMenuProps = {
   tone: "neutral" | "brand";
 };
 
-const ARROW_ONLY_WHEN_NARROW = "@max-md:[&_.truncate]:sr-only";
+const ARROW_ONLY_WHEN_NARROW = "@max-md:[&_[data-button-label]]:sr-only";
 const VISIBLE_OPTIONS = 5;
 const OPTION_HEIGHT = 32;
 const MENU_PADDING = 6;
