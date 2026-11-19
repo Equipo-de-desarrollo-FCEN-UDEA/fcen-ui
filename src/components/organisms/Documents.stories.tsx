@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Button } from "../atoms/Button";
 import { FileItem } from "../process/FileItem";
 import { DocumentViewer } from "./DocumentViewer";
 import { PdfFirstPage } from "./PdfFirstPage";
@@ -110,26 +111,35 @@ export const FileItemsWithActions: Story = {
   ),
 };
 
-function FirstPageDemo({ file }: Readonly<{ file?: Blob }>) {
-  const [loaded, setLoaded] = useState<Blob | null>(null);
+function FirstPageDemo({ source, file }: Readonly<{ source?: string; file?: Blob }>) {
+  const [shown, setShown] = useState<Blob | null>(null);
 
-  useEffect(() => {
-    if (file) return;
-    fetch(letterUrl)
-      .then((response) => response.blob())
-      .then(setLoaded);
-  }, [file]);
+  const show = () => {
+    if (file) {
+      setShown(file);
+      return;
+    }
+    if (source) {
+      fetch(source)
+        .then((response) => response.blob())
+        .then(setShown);
+    }
+  };
 
-  const shown = file ?? loaded;
   return (
-    <div className="w-full max-w-[420px] border border-gray-200 bg-white shadow-md">
-      {shown && <PdfFirstPage file={shown} label="Primera página de la carta de invitación" />}
+    <div className="flex max-w-[420px] flex-col gap-3">
+      <Button label="Ver la primera página" variant="outline" onClick={show} />
+      {shown && (
+        <div className="w-full border border-gray-200 bg-white shadow-md">
+          <PdfFirstPage file={shown} label="Primera página de la carta de invitación" />
+        </div>
+      )}
     </div>
   );
 }
 
 export const FirstPageOfPdf: Story = {
-  render: () => <FirstPageDemo />,
+  render: () => <FirstPageDemo source={letterUrl} />,
 };
 
 export const FirstPageThatFails: Story = {
