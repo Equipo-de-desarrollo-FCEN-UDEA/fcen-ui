@@ -94,6 +94,7 @@ export {
   type DocumentKind,
   type DocumentViewerProps,
 } from "./components/organisms/DocumentViewer";
+export { PdfFirstPage, type PdfFirstPageProps } from "./components/organisms/PdfFirstPage";
 export { useCountUp } from "./hooks/useCountUp";
 export {
   DEFAULT_COUNTRY,

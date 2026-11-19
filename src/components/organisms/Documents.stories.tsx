@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { Button } from "../atoms/Button";
 import { FileItem } from "../process/FileItem";
 import { DocumentViewer } from "./DocumentViewer";
+import { PdfFirstPage } from "./PdfFirstPage";
 import posterUrl from "./fixtures/afiche-congreso.png?url";
 import letterUrl from "./fixtures/carta-invitacion.pdf?url";
 import reportUrl from "./fixtures/informe-comision.docx?url";
@@ -107,4 +109,39 @@ export const FileItemsWithActions: Story = {
       <FileItem name="cumplido.pdf" state="error" detail="Supera los 5 MB" onRemove={() => undefined} />
     </div>
   ),
+};
+
+function FirstPageDemo({ source, file }: Readonly<{ source?: string; file?: Blob }>) {
+  const [shown, setShown] = useState<Blob | null>(null);
+
+  const show = () => {
+    if (file) {
+      setShown(file);
+      return;
+    }
+    if (source) {
+      fetch(source)
+        .then((response) => response.blob())
+        .then(setShown);
+    }
+  };
+
+  return (
+    <div className="flex max-w-[420px] flex-col gap-3">
+      <Button label="Ver la primera página" variant="outline" onClick={show} />
+      {shown && (
+        <div className="w-full border border-gray-200 bg-white shadow-md">
+          <PdfFirstPage file={shown} label="Primera página de la carta de invitación" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export const FirstPageOfPdf: Story = {
+  render: () => <FirstPageDemo source={letterUrl} />,
+};
+
+export const FirstPageThatFails: Story = {
+  render: () => <FirstPageDemo file={new Blob(["no es un PDF"], { type: "application/pdf" })} />,
 };

@@ -79,6 +79,8 @@ Dark mode follows the `dark` class on `<html>`.
 
 `DocumentViewer` shows PDF, Word `.docx` and image files inside a modal and offers the download for anything else. `pdfjs-dist` and `docx-preview` load with a dynamic `import()` the first time a document opens, so apps that never open one do not ship them in their main bundle. The PDF worker runs in the page, which needs no bundler setup in the consuming app.
 
+`PdfFirstPage` draws only the first page of a PDF inside the page, at the width of its container, for previews that do not open a modal. It takes the `file`, a `label` for screen readers and an optional `errorMessage`, shows a spinner while it draws and the message when the file cannot be read. It loads `pdfjs-dist` the same way `DocumentViewer` does.
+
 ## What is inside
 
 | Group | Components |
@@ -89,7 +91,7 @@ Dark mode follows the `dark` class on `<html>`.
 | Process | Stepper, Timeline, TimelineItem, FileDrop, FileItem |
 | Records | RecordCard, RecordRow |
 | Tables | Table, DataTable and table cell components |
-| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell, EntityPickerModal, DocumentViewer |
+| Organisms | TopBar, UserMenu, PageHeader, Footer, AppShell, EntityPickerModal, DocumentViewer, PdfFirstPage |
 
 Every component has its stories in Storybook, matching the Figma file of SIGA v4, with a light and dark toggle. The test suite also renders every story and checks it with axe.
 
