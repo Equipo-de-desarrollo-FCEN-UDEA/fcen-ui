@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileItem } from "../process/FileItem";
 import { DocumentViewer } from "./DocumentViewer";
+import { PdfFirstPage } from "./PdfFirstPage";
 import posterUrl from "./fixtures/afiche-congreso.png?url";
 import letterUrl from "./fixtures/carta-invitacion.pdf?url";
 import reportUrl from "./fixtures/informe-comision.docx?url";
@@ -107,4 +108,30 @@ export const FileItemsWithActions: Story = {
       <FileItem name="cumplido.pdf" state="error" detail="Supera los 5 MB" onRemove={() => undefined} />
     </div>
   ),
+};
+
+function FirstPageDemo({ file }: Readonly<{ file?: Blob }>) {
+  const [loaded, setLoaded] = useState<Blob | null>(null);
+
+  useEffect(() => {
+    if (file) return;
+    fetch(letterUrl)
+      .then((response) => response.blob())
+      .then(setLoaded);
+  }, [file]);
+
+  const shown = file ?? loaded;
+  return (
+    <div className="w-full max-w-[420px] border border-gray-200 bg-white shadow-md">
+      {shown && <PdfFirstPage file={shown} label="Primera página de la carta de invitación" />}
+    </div>
+  );
+}
+
+export const FirstPageOfPdf: Story = {
+  render: () => <FirstPageDemo />,
+};
+
+export const FirstPageThatFails: Story = {
+  render: () => <FirstPageDemo file={new Blob(["no es un PDF"], { type: "application/pdf" })} />,
 };
