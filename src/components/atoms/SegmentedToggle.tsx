@@ -32,7 +32,7 @@ export function SegmentedToggle<T extends string>({
       role="group"
       aria-label={label}
       className={clsx(
-        "relative flex select-none rounded-xl bg-gray-300 p-1 dark:bg-slate-800",
+        "relative grid select-none auto-cols-fr grid-flow-col rounded-xl bg-gray-300 p-1 dark:bg-slate-800",
         disabled && "pointer-events-none opacity-60",
         className,
       )}
@@ -53,7 +53,7 @@ export function SegmentedToggle<T extends string>({
           disabled={disabled}
           onClick={() => onChange(option.value)}
           className={clsx(
-            "relative z-10 flex-1 cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950",
+            "relative z-10 cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950",
             option.value === value
               ? "text-brand-600 dark:text-brand-300"
               : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200",

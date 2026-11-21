@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import clsx from "clsx";
+import { SHELL_CONTAINER, SHELL_TOP_BAR_HEIGHT } from "./shellContainer";
 
 export type PageHeaderProps = {
   title: string;
@@ -46,12 +47,33 @@ export type AppShellProps = {
   className?: string;
 };
 
-export const AppShell = ({ topBar, children, footer = <Footer />, className }: AppShellProps) => (
-  <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-gray-50">
-    <div className="sticky top-0 z-40">{topBar}</div>
-    <main className={clsx("mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 pt-8 pb-16 sm:px-6 lg:px-12", className)}>
-      {children}
-    </main>
-    {footer}
-  </div>
-);
+export const AppShell = ({ topBar, children, footer = <Footer />, className }: AppShellProps) => {
+  const shellRef = useRef<HTMLDivElement>(null);
+  const topBarRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const shell = shellRef.current as HTMLDivElement;
+    const bar = topBarRef.current as HTMLDivElement;
+    const publish = () => shell.style.setProperty(SHELL_TOP_BAR_HEIGHT, `${bar.offsetHeight}px`);
+    publish();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(publish);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={shellRef}
+      className="flex min-h-screen flex-col bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-gray-50"
+    >
+      <div ref={topBarRef} className="sticky top-0 z-40">
+        {topBar}
+      </div>
+      <main className={clsx(SHELL_CONTAINER, "flex flex-1 flex-col gap-6 pt-8 pb-16", className)}>
+        {children}
+      </main>
+      {footer}
+    </div>
+  );
+};
