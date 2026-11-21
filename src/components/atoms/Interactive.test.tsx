@@ -36,6 +36,13 @@ describe("SegmentedToggle", () => {
     expect(indicator.style.transform).toBe("translateX(0%)");
   });
 
+  it("gives every option the width of the widest one, so the toggle can hug them without clipping", () => {
+    render(<SegmentedToggle label="Vista" value="mine" options={[...views]} onChange={vi.fn()} className="w-fit" />);
+
+    expect(screen.getByRole("group", { name: "Vista" })).toHaveClass("grid", "grid-flow-col", "auto-cols-fr", "w-fit");
+    for (const button of screen.getAllByRole("button")) expect(button).not.toHaveClass("flex-1");
+  });
+
   it("blocks every option when disabled", () => {
     render(<SegmentedToggle value="mine" options={[...views]} onChange={vi.fn()} disabled />);
 

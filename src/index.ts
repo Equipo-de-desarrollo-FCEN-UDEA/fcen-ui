@@ -81,6 +81,7 @@ export {
   type PageHeaderProps,
 } from "./components/organisms/Layout";
 export { TopBar, type ThemeMode, type TopBarProps } from "./components/organisms/TopBar";
+export { SHELL_CONTAINER, SHELL_TOP_BAR_HEIGHT } from "./components/organisms/shellContainer";
 export {
   UserMenu,
   type UserMenuLink,

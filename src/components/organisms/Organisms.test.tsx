@@ -1,8 +1,9 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Briefcase, Building2, MonitorSmartphone } from "lucide-react";
 import { EntityPickerModal } from "./EntityPickerModal";
 import { AppShell, Footer, PageHeader } from "./Layout";
+import { SHELL_CONTAINER, SHELL_TOP_BAR_HEIGHT } from "./shellContainer";
 import { TopBar } from "./TopBar";
 import { UserMenu } from "./UserMenu";
 
@@ -194,5 +195,75 @@ describe("Layout", () => {
     );
 
     expect(screen.getByRole("contentinfo")).toHaveTextContent("© 2026 SIGA");
+  });
+
+  it("lines up the top bar with the content on any screen width", () => {
+    render(
+      <AppShell topBar={<TopBar name="Juan Giraldo" onSignOut={() => undefined} />}>
+        <PageHeader title="Mis comisiones" />
+      </AppShell>,
+    );
+
+    const bar = screen.getByRole("button", { name: /Salir/ }).parentElement?.parentElement;
+    const content = screen.getByRole("main");
+    for (const container of [bar, content]) expect(container).toHaveClass(...SHELL_CONTAINER.split(" "));
+  });
+
+  describe("height of the top bar", () => {
+    let height = 89;
+    let observed: ResizeObserverCallback | null = null;
+    const disconnect = vi.fn();
+
+    beforeEach(() => {
+      height = 89;
+      observed = null;
+      vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("sticky") ? height : 0;
+      });
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          constructor(callback: ResizeObserverCallback) {
+            observed = callback;
+          }
+          observe() {}
+          disconnect = disconnect;
+        },
+      );
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    function shell() {
+      return screen.getByRole("main").parentElement as HTMLElement;
+    }
+
+    it("publishes it so content can stick right below the bar", () => {
+      render(
+        <AppShell topBar={<TopBar name="Juan Giraldo" />}>
+          <PageHeader title="Plantilla" />
+        </AppShell>,
+      );
+
+      expect(shell().style.getPropertyValue(SHELL_TOP_BAR_HEIGHT)).toBe("89px");
+    });
+
+    it("follows the bar when it changes size and stops watching it when the shell goes away", () => {
+      const { unmount } = render(
+        <AppShell topBar={<TopBar name="Juan Giraldo" />}>
+          <PageHeader title="Plantilla" />
+        </AppShell>,
+      );
+
+      height = 120;
+      act(() => observed?.([], {} as ResizeObserver));
+      expect(shell().style.getPropertyValue(SHELL_TOP_BAR_HEIGHT)).toBe("120px");
+
+      unmount();
+      expect(disconnect).toHaveBeenCalled();
+    });
   });
 });
